@@ -55,6 +55,12 @@ static header_t *morecore(size_t num_units)
     void *vp;
     header_t *up;
 
+	/*  problem 
+		after first call morecore sbrk(0) = b000	
+		so first block in usedp start freom b000, it has size 14 so next sbrk(0) 		
+		should be 
+	*/
+		
     if (num_units > MIN_ALLOC_SIZE)
         num_units = MIN_ALLOC_SIZE / sizeof(header_t);
 
