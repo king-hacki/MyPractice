@@ -118,6 +118,18 @@ struct test_last {		// sizeof() here is also 16
 
 */
 
+	//	task
+	//	take 5 value from file text.txt
+	// in text [x 9 213412341235235 false 100 85 3234856 x]
+	// * in %*s take string but miss
+
+	FILE *test;
+	int find = 0;
+	test = fopen("text.txt", "r");
+	printf("%d \n", find);
+	fscanf(test, "%*c %*d %*lu %*s %d", &find);
+	printf("%d \n", find);
+
     return 0;
 }
 

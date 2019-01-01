@@ -7,7 +7,7 @@
 //#include "garbage.h" 
 
 #define MIN_ALLOC_SIZE 4096     /* We allocate blocks in page sized chunks. */
-#define UNTAG(p) (((uintptr_t) (p)) & 0xfffffffc)
+#define UNTAG(p) (header_t *)(((uintptr_t) (p)) & 0xfffffffffffe)
 
 typedef struct header {
     unsigned int    size;
@@ -18,7 +18,7 @@ typedef struct header {
 static header_t base;           /* Zero sized block to get us started. */
 static header_t *freep = &base; /* Points to first free block of memory. */
 static header_t *usedp;         /* Points to first used block of memory. */
-static unsigned long stack_bottom;
+static unsigned long stack_bottom = 0; // if we don't initialize 0 dont't find in fscanf
 /*
  * Scan the free list and look for a place to put the block. Basically, we're
  * looking for any block the to be freed block might have been partitioned from.
@@ -32,7 +32,7 @@ static void add_to_free_list(header_t *bp)
     for (p = freep; !(bp > p && bp < p->next); p = p->next)
         if (p >= p->next && (bp > p || bp < p->next))
             break;
-
+	
 
     if (bp + bp->size == p->next) {
         bp->size += p->next->size;
@@ -89,13 +89,13 @@ void *GC_malloc(size_t alloc_size)
             if (p->size == num_units) /* Exact size. */
                 prevp->next = p->next;
             else {
-                p->size -= num_units;
-				header_t *temp = p;
-				temp->size = p->size;
+                header_t *temp = p;
+				temp += num_units;
+				temp->size = p->size - num_units;
 				temp->next = p->next;
-                p += p->size;
-                p->size = num_units;
-				add_to_free_list(temp);	///	<------------ 	START FROM HERE TOMORROW
+				prevp->next = temp;
+				p->size = num_units;	
+
             }
 
             // freep = prevp;			wtf? I think this don't need
@@ -110,12 +110,6 @@ void *GC_malloc(size_t alloc_size)
 
             return (void *) (p + 1);
         }
-/*
-        if (p == NULL) { /* Not enough memory. 
-            p = morecore(num_units);
-            if (p == NULL) /* Request for more memory failed. 
-                return NULL;
-        }	*/
     }
 }
 
@@ -123,21 +117,44 @@ void *GC_malloc(size_t alloc_size)
  * Scan a region of memory and mark any items in the used list appropriately.
  * Both arguments should be word aligned.
  */
-static void scan_region(unsigned int *sp, unsigned int *end)
+static void scan_region(uintptr_t *sp, uintptr_t *end)	// 		need more test
 {
-    header_t *bp;
 
-    for (; sp < end; sp++) {
-        unsigned int v = *sp;
-        bp = usedp;
-        do {
-            if ((uintptr_t)(bp + 1) <= v &&
-                (uintptr_t)(bp + 1 + bp->size) > v) {
-                    bp->next = (header_t *)(((uintptr_t) bp->next) | 1);
-                    break;
-            }
-        } while ((bp = (header_t *)UNTAG(bp->next)) != usedp);
-    }
+	header_t *p;
+	header_t *prevp;	
+	header_t *start_ptr = freep->next;
+	header_t *last_ptr;
+
+	header_t *end_use = usedp->next;
+	header_t *end_free = freep->next;
+
+	for (p = usedp; p->next != NULL; p = p->next){}
+	end_use = p + p->size;
+	
+	for (p = freep; p->next != NULL; p = p->next){}
+	end_free = p + p->size;
+
+	if (end_free > end_use)
+		last_ptr = end_free;
+	else 
+		last_ptr = end_use;
+
+	while (sp < end) {		// from start to end set region	//	<--- test more here
+		if ((uintptr_t *)start_ptr <= (uintptr_t *)*sp && 
+			(uintptr_t *)last_ptr >= (uintptr_t *)*sp) {  
+			prevp = usedp;
+			for (p = UNTAG(prevp->next); p != NULL; prevp = UNTAG(p), p = p->next) {	// go through the used list
+				if (((header_t *)*sp) - 1 == p) {
+					p = (header_t *)((uintptr_t)p | 1);
+					prevp->next = p;
+				} 		
+			}
+			if (((header_t *)*sp) - 1 == prevp) {
+				prevp = (header_t *)((uintptr_t)prevp | 1);
+			} 
+		}
+	sp++; 
+	}
 }
 
 /*
@@ -145,15 +162,15 @@ static void scan_region(unsigned int *sp, unsigned int *end)
  */
 static void scan_heap(void)
 {
-    unsigned int *vp;
+    uintptr_t *vp;
     header_t *bp, *up;
 
-    for (bp = (header_t *)UNTAG(usedp->next); bp != usedp; bp = (header_t *)UNTAG(bp->next)) {
+    for (bp = UNTAG(usedp->next); bp != NULL; bp = UNTAG(bp->next)) {
         if (!((uintptr_t)bp->next & 1))
             continue;
-        for (vp = (unsigned int *)(bp + 1); vp < (unsigned int *)(bp + bp->size + 1); vp++) {
-            unsigned int v = *vp;
-            up = (header_t *)UNTAG(bp->next);
+        for (vp = (uintptr_t *)(bp + 1); vp < (uintptr_t *)(bp + bp->size + 1); vp++) {
+            uintptr_t v = *vp;
+            up = UNTAG(bp->next);
             do {
                 if (up != bp &&
                     (uintptr_t)(up + 1) <= v &&
@@ -161,9 +178,29 @@ static void scan_heap(void)
                     up->next = (header_t *)(((uintptr_t) up->next) | 1);
                     break;
                 }
-            } while ((up = (header_t *)UNTAG(up->next)) != bp);
+            } while ((up = UNTAG(up->next)) != bp);
         }
     }
+}
+
+static void collect () {
+	header_t *prevp = usedp;
+	header_t *p;
+
+	for (p = prevp; p != NULL; prevp = p, p = p->next) {
+		if (p != UNTAG(p)) {
+			if (UNTAG(p) == UNTAG(prevp)) 
+				usedp->next = p->next;
+			else 
+				prevp->next = p->next;
+			add_to_free_list(UNTAG(p));
+		}
+	}
+
+	for (p = usedp; p != NULL; p = p->next) {
+		p = UNTAG(p);
+	} 
+
 }
 
 /*
@@ -171,16 +208,17 @@ static void scan_heap(void)
  */
 void GC_init(void)
 {
-    static int initted;
+    static int initted;		// wtf?
     FILE *statfp;
 
-    if (initted)
+    if (initted)		// for what?
         return;
 
     initted = 1;
 
     statfp = fopen("/proc/self/stat", "r");
     assert(statfp != NULL);
+	// in /proc/self/stat file 28 value mean start stack
     fscanf(statfp,
            "%*d %*s %*c %*d %*d %*d %*d %*d %*u "
            "%*lu %*lu %*lu %*lu %*lu %*lu %*ld %*ld "
@@ -188,9 +226,6 @@ void GC_init(void)
            "%*lu %*lu %*lu %lu", &stack_bottom);
     fclose(statfp);
 
-    usedp = NULL;
-    base.next = freep = &base;
-    base.size = 0;
 }
 
 /*
@@ -205,39 +240,21 @@ void GC_collect(void)
     if (usedp == NULL)
         return;
 
+	GC_init();	
+
     /* Scan the BSS and initialized data segments. */
-    scan_region((unsigned int *)&etext, (unsigned int *)&end);
+    scan_region((uintptr_t *)&etext, (uintptr_t*)&end);
 
     /* Scan the stack. */
     asm volatile ("movq %%rbp, %0" : "=r" (stack_top));
-    scan_region((unsigned int *)stack_top, (unsigned int *)stack_bottom);
+    scan_region((uintptr_t *)stack_top, (uintptr_t *)stack_bottom);
 
     /* Mark from the heap. */
     scan_heap();
 
-    /* And now we collect! */
-    for (prevp = usedp, p = (header_t *)UNTAG(usedp->next);; prevp = p, p = (header_t *)UNTAG(p->next)) {
-    next_chunk:
-        if (!((uintptr_t)p->next & 1)) {
-            /*
-             * The chunk hasn't been marked. Thus, it must be set free. 
-             */
-            tp = p;
-            p = (header_t *)UNTAG(p->next);
-            add_to_free_list(tp);
+ /*    And now we collect! 	*/
+	collect();
 
-            if (usedp == tp) { 
-                usedp = NULL;
-                break;
-            }
-
-            prevp->next = (header_t *)((uintptr_t)p | ((uintptr_t) prevp->next & 1));
-            goto next_chunk;
-        }
-        p->next = (header_t *)(((uintptr_t) p->next) & ~1);
-        if (p == usedp)
-            break;
-    }
 }
 
 void GC_free (void *ptr) {
@@ -262,23 +279,83 @@ void GC_free (void *ptr) {
 	if (flag)	printf("[-] Not gc_malloc ptr \n");
 }
 
+static void display_lists () {
+	header_t *p;
+	
+	printf("\n FREE LIST { \n");
+	for (p = freep; p != NULL; p = p->next) {
+		printf("\t size : [%d]\n", p->size);
+		printf("\t this block : [%p]\n", p);
+		printf("\t next block : [%p]\n", p->next);
+		printf("\t this block + size : [%p]\n", p + p->size);
+	}
+	printf("  }\n\n");
+
+	printf("\n USE LIST { \n");
+	for (p = usedp; p != NULL; p = p->next) {
+		printf("\t size : [%d]\n", p->size);
+		printf("\t this block : [%p]\n", (uintptr_t *)p);
+		printf("\t next block : [%p]\n", p->next);
+		printf("\t this block + size : [%p]\n", p + p->size);
+	}
+	printf("  }\n\n");
+}
 
 int main () 
 {
     char *y = (char *)GC_malloc(200);
+	printf("[+] y pointer : %p \t\t(-1)\n", y - 16);
+	printf("[+] y adress : %p \n", &y);
+	display_lists();
+
     char *x = (char *)GC_malloc(2000);
+	printf("[+] x pointer : %p \t\t(-1)\n", x - 16);
+	printf("[+] x adress : %p \n", &x);
+	display_lists();
+	
 	GC_free(y);
+	printf("[+] free : y \n");
+	display_lists();
+
     char *v = (char *)GC_malloc(100);
+	printf("[+] v pointer : %p \t\t(-1)\n", v - 16);
+	printf("[+] v adress : %p \n", &v);
+	display_lists();
+
 	char *z = (char *)GC_malloc(300);
+	printf("[+] z pointer : %p \t\t(-1)\n", z - 16);
+	printf("[+] z adress : %p \n", &z);
+	display_lists();
+
+
 	GC_free(z);
+	printf("[+] free : z \n");
+	display_lists();
+
 	GC_free(x);
+	printf("[+] free : x \n");
+	display_lists();
+
 	GC_free(v);
+	printf("[+] free : v \n");
+	display_lists();
+
 	char *e = (char *)GC_malloc(300);
+	printf("[+] e pointer : %p \t\t(-1)\n", e - 16);
+	printf("[+] e adress : %p \n", &e);
+	display_lists();
+
+	char *f = (char *)GC_malloc(700);
+	printf("[+] f pointer : %p \t\t(-1)\n", f - 16);
+	printf("[+] f adress : %p \n", &f);
+	display_lists();
 
     e = NULL;
-
-    GC_init();
+  
     GC_collect();
+
+	printf("[+] garbage_collect \n");
+	display_lists();
 
     return 0;
 }
