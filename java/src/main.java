@@ -1,12 +1,13 @@
 package src;
 
 import java.util.Arrays;
+import src.algorithms.insertionSort.*;
 import static src.algorithms.quickSort.QuickSort.*;
 
 class Main {
 	public static void main (String [] args) {
 
-/*	insertion sort
+///*	insertion sort
 
 		ListNode n1 = new ListNode(2);
 		ListNode n2 = new ListNode(3);
@@ -25,7 +26,7 @@ class Main {
 		n1 = InsertionSort.insertionSortList(n1);
 //*/
 
-///*	quick sort
+/*	quick sort
 
 		int[] arr = {4, 5, 1, 2, 3, 3, 2, 4, 6, 2, 76};
        	 	quickSort_right(arr, 0, arr.length - 1);

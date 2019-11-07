@@ -2,7 +2,7 @@ package src.algorithms.insertionSort;
 
 import java.util.*;
 
-class InsertionSort {
+public class InsertionSort {
 	public static ListNode insertionSortList(ListNode head) {
  
 		if (head == null || head.next == null)
