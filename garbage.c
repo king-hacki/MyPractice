@@ -45,8 +45,6 @@ static void add_to_free_list(header_t *bp)
         p->next = bp->next;
     } else
         p->next = bp;
-
-    freep = p;
 }
 
 /*
@@ -80,28 +78,31 @@ void *GC_malloc(size_t alloc_size)
     num_units = (alloc_size + sizeof(header_t) - 1) / sizeof(header_t) + 1;  
     prevp = freep;
 
-    if (prevp->next == 0){ // error in start code prevp->next can case segment. 
-        p = morecore(num_units);
-        if (p == NULL) /* Request for more memory failed. */
-            return NULL;
-    }
-
-
     for (p = prevp->next;; prevp = p, p = p->next) {
+		if (p == NULL) {
+			p = morecore(num_units);
+			if (p == NULL) {
+				return NULL;			
+			}			
+		}
         if (p->size >= num_units) { /* Big enough. */
             if (p->size == num_units) /* Exact size. */
                 prevp->next = p->next;
             else {
                 p->size -= num_units;
+				header_t *temp = p;
+				temp->size = p->size;
+				temp->next = p->next;
                 p += p->size;
                 p->size = num_units;
+				add_to_free_list(temp);	///	<------------ 	START FROM HERE TOMORROW
             }
 
-            freep = prevp;
+            // freep = prevp;			wtf? I think this don't need
 
             /* Add to p to the used list. */
             if (usedp == NULL)  
-                usedp = p->next = p;
+                usedp  = p;
             else {
                 p->next = usedp->next;
                 usedp->next = p;
@@ -109,11 +110,12 @@ void *GC_malloc(size_t alloc_size)
 
             return (void *) (p + 1);
         }
-        if (p == freep) { /* Not enough memory. */
+/*
+        if (p == NULL) { /* Not enough memory. 
             p = morecore(num_units);
-            if (p == NULL) /* Request for more memory failed. */
+            if (p == NULL) /* Request for more memory failed. 
                 return NULL;
-        }
+        }	*/
     }
 }
 
@@ -238,14 +240,42 @@ void GC_collect(void)
     }
 }
 
+void GC_free (void *ptr) {
+	header_t *take = (header_t *) ptr;
+	take -= 1;
+	int flag = 1;
+
+	if (take == usedp) {
+		flag = 0;
+		usedp = take->next;
+		add_to_free_list(take);
+	} else {
+		for (header_t *p = usedp; p != NULL; p = p->next) {
+			if (p->next == take) {
+				flag = 0;
+				p->next = take->next;
+				add_to_free_list(take);
+				break;
+			}
+		}
+	}
+	if (flag)	printf("[-] Not gc_malloc ptr \n");
+}
+
+
 int main () 
 {
-    char *a = (char *)GC_malloc(200);
-    char *b = (char *)GC_malloc(2000);
-    char *c = (char *)GC_malloc(800);
+    char *y = (char *)GC_malloc(200);
+    char *x = (char *)GC_malloc(2000);
+	GC_free(y);
+    char *v = (char *)GC_malloc(100);
+	char *z = (char *)GC_malloc(300);
+	GC_free(z);
+	GC_free(x);
+	GC_free(v);
+	char *e = (char *)GC_malloc(300);
 
-    a = NULL;
-    c = NULL;
+    e = NULL;
 
     GC_init();
     GC_collect();
