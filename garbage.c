@@ -19,6 +19,7 @@ static header_t base;           /* Zero sized block to get us started. */
 static header_t *freep = &base; /* Points to first free block of memory. */
 static header_t *usedp;         /* Points to first used block of memory. */
 static unsigned long stack_bottom = 0; // if we don't initialize 0 dont't find in fscanf
+int first_block_flag = 1; // for creating first block because of allocate due to sbrk more than need
 /*
  * Scan the free list and look for a place to put the block. Basically, we're
  * looking for any block the to be freed block might have been partitioned from.
@@ -50,25 +51,57 @@ static void add_to_free_list(header_t *bp)
 /*
  * Request more memory from the kernel.
  */
-static header_t *morecore(size_t num_units)
+static header_t *morecore()
 {
     void *vp;
     header_t *up;
 
-	/*  problem 
-		after first call morecore sbrk(0) = b000	
-		so first block in usedp start freom b000, it has size 14 so next sbrk(0) 		
-		should be 
-	*/
 		
-    if (num_units > MIN_ALLOC_SIZE)
-        num_units = MIN_ALLOC_SIZE / sizeof(header_t);
+	/*
+		When we run 126 (2016) in num_units sbrk() give 8192 -> 2048 * 4 	???
+		This shit isn`t predictable so we change num_units before up->size
+		noooo
+
+		after first block sbrk allocate block from 8192	no matter what a size was allocated
+		why ???
+
+		i will fix it by allocating only 8192 memory
+	
+	*/
+
+	/*
+	
+		VARIANT 1 
+		first call morecore() allocate 8192 memory 
+		and next calls will allocate memory as much as need.
+
+	if (first_block_flag) {
+		num_units = 512;
+		first_block_flag = 0;
+	}	 
 
     if ((vp = (void *)sbrk(num_units * sizeof(header_t))) == (void *) -1)
         return NULL;
 
+	*/
+
+	/* 
+		VARIANT 2
+		every call of morecore() allocate 8192 memory. I think this var. is better
+	*/
+
+	if ((vp = (void *) sbrk(512 * sizeof(header_t))) == (void *) -1)
+		return 0;
+
+	/*
+		ufffffffffffffffffffffff
+		EVERY TIME WHEN I CALL MORECORE() FIRSTLY HIS SBRK() GIVE ME MUCH MORE MEMORY WTF???
+		at now i haven`t enough knowlege to tell what a fuck is going on
+		in a future i will return to this chunk of code!!!	[-]		
+	*/
+
     up = (header_t *) vp;
-    up->size = num_units;
+    up->size = 512;
     add_to_free_list (up);
     return freep;
 }
@@ -86,7 +119,7 @@ void *GC_malloc(size_t alloc_size)
 
     for (p = prevp->next;; prevp = p, p = p->next) {
 		if (p == NULL) {
-			p = morecore(num_units);
+			p = morecore();
 			if (p == NULL) {
 				return NULL;			
 			}			
@@ -123,42 +156,25 @@ void *GC_malloc(size_t alloc_size)
  * Scan a region of memory and mark any items in the used list appropriately.
  * Both arguments should be word aligned.
  */
-static void scan_region(uintptr_t *sp, uintptr_t *end)	// 		need more test
+static void scan_region(uintptr_t *sp, uintptr_t *end)	// 		need more test [-] [+]
 {
 
 	header_t *p;
 	header_t *prevp;	
-	header_t *start_ptr = freep->next;
-	header_t *last_ptr;
 
-	header_t *end_use = usedp->next;
-	header_t *end_free = freep->next;
-
-	for (p = usedp; p->next != NULL; p = p->next){}
-	end_use = p + p->size;
-	
-	for (p = freep; p->next != NULL; p = p->next){}
-	end_free = p + p->size;
-
-	if (end_free > end_use)
-		last_ptr = end_free;
-	else 
-		last_ptr = end_use;
-
-	while (sp < end) {		// from start to end set region	//	<--- test more here
-		if ((uintptr_t *)start_ptr <= (uintptr_t *)*sp && 
-			(uintptr_t *)last_ptr >= (uintptr_t *)*sp) {  
+	while (sp < end) {		// from start to end set region	//	<--- test more here  [+]
 			prevp = usedp;
-			for (p = UNTAG(prevp->next); p != NULL; prevp = UNTAG(p), p = p->next) {	// go through the used list
+			header_t *temp;		//  	to take variable but not UNTAG() them
+			for (p = UNTAG(prevp->next); UNTAG(p) != NULL ; prevp = p, temp = UNTAG(p), p = temp->next) {	// go through the used list
 				if (((header_t *)*sp) - 1 == p) {
 					p = (header_t *)((uintptr_t)p | 1);
-					prevp->next = p;
+					temp = UNTAG(prevp);
+					temp->next = p;
 				} 		
 			}
 			if (((header_t *)*sp) - 1 == prevp) {
 				prevp = (header_t *)((uintptr_t)prevp | 1);
 			} 
-		}
 	sp++; 
 	}
 }
@@ -166,44 +182,35 @@ static void scan_region(uintptr_t *sp, uintptr_t *end)	// 		need more test
 /*
  * Scan the marked blocks for references to other unmarked blocks.
  */
-static void scan_heap(void)
+static void scan_heap(void)		// 			didn't watch 
 {
-    uintptr_t *vp;
-    header_t *bp, *up;
+    header_t *p;
 
-    for (bp = UNTAG(usedp->next); bp != NULL; bp = UNTAG(bp->next)) {
-        if (!((uintptr_t)bp->next & 1))
-            continue;
-        for (vp = (uintptr_t *)(bp + 1); vp < (uintptr_t *)(bp + bp->size + 1); vp++) {
-            uintptr_t v = *vp;
-            up = UNTAG(bp->next);
-            do {
-                if (up != bp &&
-                    (uintptr_t)(up + 1) <= v &&
-                    (uintptr_t)(up + 1 + up->size) > v) {
-                    up->next = (header_t *)(((uintptr_t) up->next) | 1);
-                    break;
-                }
-            } while ((up = UNTAG(up->next)) != bp);
-        }
-    }
-}
+	header_t *temp;		// 	make all things like in scan_region()
+	for (p = UNTAG(usedp); temp->next != NULL; temp = UNTAG(p), p = temp->next) {
+		scan_region((uintptr_t *)p, (uintptr_t *)(p + p->size));
+	}
+}            
 
 static void collect () {
 	header_t *prevp = usedp;
 	header_t *p;
+	header_t *temp; 	// make all things like in scan_region()
 
-	for (p = prevp; p != NULL; prevp = p, p = p->next) {
+	for (p = UNTAG(prevp); UNTAG(p) != NULL; prevp = UNTAG(p), p = UNTAG(prevp->next)) {
 		if (p != UNTAG(p)) {
-			if (UNTAG(p) == UNTAG(prevp)) 
-				usedp->next = p->next;
-			else 
-				prevp->next = p->next;
+			if (UNTAG(p) == UNTAG(prevp)) {
+				temp = UNTAG(p);
+				usedp->next = temp->next;
+			} else {
+				temp = UNTAG(p);
+				prevp->next = temp->next;
+			}
 			add_to_free_list(UNTAG(p));
 		}
 	}
 
-	for (p = usedp; p != NULL; p = p->next) {
+	for (p = UNTAG(usedp); UNTAG(p) != NULL; temp = UNTAG(p), p = UNTAG(temp->next)) {
 		p = UNTAG(p);
 	} 
 
@@ -212,12 +219,12 @@ static void collect () {
 /*
  * Find the absolute bottom of the stack and set stuff up.
  */
-void GC_init(void)
+static void GC_init(void)
 {
     static int initted;		// wtf?
     FILE *statfp;
 
-    if (initted)		// for what?
+    if (initted)		// for what?	[+]
         return;
 
     initted = 1;
@@ -298,7 +305,7 @@ static void display_lists () {
 	printf("  }\n\n");
 
 	printf("\n USE LIST { \n");
-	for (p = usedp; p != NULL; p = p->next) {
+	for (p = usedp; p->next != NULL && p->size != 0; p = p->next) {	// p->size != 0 ??? [-]
 		printf("\t size : [%d]\n", p->size);
 		printf("\t this block : [%p]\n", (uintptr_t *)p);
 		printf("\t next block : [%p]\n", p->next);
@@ -314,10 +321,36 @@ int main ()
 	printf("[+] y adress : %p \n", &y);
 	display_lists();
 
-    char *x = (char *)GC_malloc(2000);
+    char *x = (char *)GC_malloc(10);
 	printf("[+] x pointer : %p \t\t(-1)\n", x - 16);
 	printf("[+] x adress : %p \n", &x);
 	display_lists();
+
+	char *x2 = (char *)GC_malloc(3000);
+	printf("[+] x2 pointer : %p \t\t(-1)\n", x2 - 16);
+	printf("[+] x2 adress : %p \n", &x2);
+	display_lists();
+
+	char *x3 = (char *)GC_malloc(4000);
+	printf("[+] x3 pointer : %p \t\t(-1)\n", x3 - 16);
+	printf("[+] x3 adress : %p \n", &x3);
+	display_lists();
+
+	char *x4 = (char *)GC_malloc(5000);
+	printf("[+] x4 pointer : %p \t\t(-1)\n", x4 - 16);
+	printf("[+] x4 adress : %p \n", &x4);
+	display_lists();
+
+	char *x5 = (char *)GC_malloc(6000);
+	printf("[+] x5 pointer : %p \t\t(-1)\n", x5 - 16);
+	printf("[+] x5 adress : %p \n", &x5);
+	display_lists();
+
+
+	char *x6 = (char *)GC_malloc(7000);
+	printf("[+] x6 pointer : %p \t\t(-1)\n", x6 - 16);
+	printf("[+] x6 adress : %p \n", &x6);
+	display_lists();	
 	
 	GC_free(y);
 	printf("[+] free : y \n");
@@ -357,9 +390,10 @@ int main ()
 	display_lists();
 
     e = NULL;
-  
-    GC_collect();
+	f = NULL;
 
+    GC_collect();
+	
 	printf("[+] garbage_collect \n");
 	display_lists();
 
