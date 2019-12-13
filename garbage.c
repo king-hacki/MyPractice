@@ -165,18 +165,19 @@ static void scan_region(uintptr_t *sp, uintptr_t *end)	// 		need more test [-] [
 	while (sp < end) {		// from start to end set region	//	<--- test more here  [+]
 			prevp = usedp;
 			header_t *temp;		//  	to take variable but not UNTAG() them
-			for (p = UNTAG(prevp->next); UNTAG(p) != NULL ; prevp = p, temp = UNTAG(p), p = temp->next) {	// go through the used list
-				if (((header_t *)*sp) - 1 == p) {
+			for (p = UNTAG(prevp->next); UNTAG(p->next) != NULL; prevp = UNTAG(p), temp = UNTAG(p), p = UNTAG(temp->next)) {	// go through the used list
+				if (((header_t *)*sp) - 1 == UNTAG(p)) {
 					p = (header_t *)((uintptr_t)p | 1);
 					temp = UNTAG(prevp);
 					temp->next = p;
 				} 		
 			}
-			if (((header_t *)*sp) - 1 == prevp) {
-				prevp = (header_t *)((uintptr_t)prevp | 1);
+			if (((header_t *)*sp) - 1 == UNTAG(usedp)) {
+				usedp = (header_t *)((uintptr_t)usedp | 1);
 			} 
 	sp++; 
 	}
+
 }
 
 /*
@@ -187,33 +188,36 @@ static void scan_heap(void)		// 			didn't watch
     header_t *p;
 
 	header_t *temp;		// 	make all things like in scan_region()
-	for (p = UNTAG(usedp); temp->next != NULL; temp = UNTAG(p), p = temp->next) {
+	for (p = UNTAG(usedp), temp = UNTAG(p); UNTAG(temp->p) != NULL; temp = UNTAG(p), p = UNTAG(temp->next)) {
 		scan_region((uintptr_t *)p, (uintptr_t *)(p + p->size));
 	}
 }            
 
 static void collect () {
-	header_t *prevp = usedp;
+	//		here usedp->next->next->next = 5793
+	header_t *prevp = UNTAG(usedp);
 	header_t *p;
 	header_t *temp; 	// make all things like in scan_region()
 
-	for (p = UNTAG(prevp); UNTAG(p) != NULL; prevp = UNTAG(p), p = UNTAG(prevp->next)) {
+	for (p = UNTAG(prevp->next); UNTAG(p->next) != NULL; prevp = UNTAG(p), temp = UNTAG(p), p = UNTAG(temp->next)) {
 		if (p != UNTAG(p)) {
-			if (UNTAG(p) == UNTAG(prevp)) {
-				temp = UNTAG(p);
-				usedp->next = temp->next;
-			} else {
-				temp = UNTAG(p);
-				prevp->next = temp->next;
-			}
-			add_to_free_list(UNTAG(p));
+			temp = UNTAG(p);
+			prevp->next = temp->next;
+			add_to_free_list(UNTAG(p));		
 		}
 	}
+	
+	if (prevp != usedp) {
+		temp = UNTAG(prevp);
+		add_to_free_list(prevp);
+		usedp = temp->next;
+	}
 
-	for (p = UNTAG(usedp); UNTAG(p) != NULL; temp = UNTAG(p), p = UNTAG(temp->next)) {
+	prevp = UNTAG(usedp);
+	for (p = UNTAG(prevp->next); UNTAG(p->next) != NULL; prevp = UNTAG(p), temp = UNTAG(p), p = UNTAG(temp->next)) {
+		prevp->next = UNTAG(p);
 		p = UNTAG(p);
-	} 
-
+	}
 }
 
 /*
