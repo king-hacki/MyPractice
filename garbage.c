@@ -129,9 +129,11 @@ void *GC_malloc(size_t alloc_size)
                 prevp->next = p->next;
             else {
                 header_t *p2 = p;
-                p += p->size - num_units;
+                p2 = p + num_units;
+                p2->size = p->size - num_units;
                 p->size = num_units;
-                p2->size -= num_units;
+                p2->next = p->next;
+                prevp->next = p2;
             }
 
             /* Add to p to the used list. */
@@ -147,6 +149,28 @@ void *GC_malloc(size_t alloc_size)
     }
 }
 
+void GC_free (void *ptr) {
+	header_t *take = (header_t *) ptr;
+	take -= 1;
+	int flag = 1;
+
+	if (take == usedp) {
+		flag = 0;
+		usedp = take->next;
+		add_to_free_list(take);
+	} else {
+		for (header_t *p = usedp; p != NULL; p = p->next) {
+			if (p->next == take) {
+				flag = 0;
+				p->next = take->next;
+				add_to_free_list(take);
+				break;
+			}
+		}
+	}
+	if (flag)	printf("[-] Not gc_malloc ptr : [ %p ] \n", take);
+}
+
 /*
  * Scan a region of memory and mark any items in the used list appropriately.
  * Both arguments should be word aligned.
@@ -157,15 +181,19 @@ static void scan_region (uintptr_t *start, uintptr_t *end)	// 		scan set region 
 	printf(" \n[+] scan_region method start \n");
 	printf("[+] scan start in [ %p ] - scan end in [ %p ] \n\n", start, end);
 
-	header_t *block;
-	header_t *untag_block;
+	header_t *prev_block;
+	prev_block->next = usedp;
+
+	//		end here take care abovt prev_block->next not ( | 1) fix ......
 
 	while ((uintptr_t)start < (uintptr_t) end) {
 				
-		for (block = usedp; UNTAG(block) != NULL; untag_block = UNTAG(block), block = untag_block->next ) {			
-			if ((uintptr_t) block == (uintptr_t) ((header_t *)*start - 1)) {
+		for (block = usedp; UNTAG(block) != NULL;
+		 untag_block = UNTAG(block), block = untag_block->next ) {			
+			if ((uintptr_t) prev_block->next == (uintptr_t) ((header_t *)*start - 1)) {
 				printf("[+] find block : [ %p ] \n", (header_t *)*start - 1);
-				block = (header_t *)((uintptr_t) block | 1);
+				prev_block->next = (header_t *)((uintptr_t) block | 1);
+				
 			}
 		}
 		(uintptr_t) start++;
@@ -192,7 +220,17 @@ static void scan_heap(void)		// 	scan heap
 }            
 
 static void collect () {	//		collect unmarked blocks
-
+	
+	header_t *block;
+	header_t *untag_block;
+	
+	for (block = usedp; UNTAG(block) != NULL; untag_block = UNTAG(block), block = UNTAG(untag_block->next))
+		if (block == UNTAG(block)) 
+			GC_free(UNTAG(block) + 1);
+			
+	for (block = UNTAG(usedp); UNTAG(block) != NULL; untag_block = UNTAG(block), block = UNTAG(untag_block->next))
+		block = UNTAG(block);
+	
 }
 
 /*
@@ -249,43 +287,51 @@ void GC_collect()
 
 }
 
-void GC_free (void *ptr) {
-	header_t *take = (header_t *) ptr;
-	take -= 1;
-	int flag = 1;
+void DIS () {
 
-	if (take == usedp) {
-		flag = 0;
-		usedp = take->next;
-		add_to_free_list(take);
-	} else {
-		for (header_t *p = usedp; p != NULL; p = p->next) {
-			if (p->next == take) {
-				flag = 0;
-				p->next = take->next;
-				add_to_free_list(take);
-				break;
-			}
-		}
-	}
-	if (flag)	printf("[-] Not gc_malloc ptr \n");
+
+	printf("\n[+] free list \n");
+	for (header_t *block = freep->next; block != NULL; block = block->next) 
+		printf("\t[+] adress : [ %p ]\tsize : [ %d ]\tnext : [ %p ]\n", block, block->size, block->next);
+
+	printf("[+] used list \n");
+	for (header_t *block = usedp; block != NULL; block = block->next) 
+		printf("\t[+] adress : [ %p ]\tsize : [ %d ]\tnext : [ %p ]\n", block, block->size, block->next);
+	
+
 }
 
 int main () 
 {
-    char *y = (char *)GC_malloc(200);		//	end here scan_region() don't see y....
-    char *x = (char *)GC_malloc(10000);
+    char *y = (char *)GC_malloc(200);		
+    printf("\n[+] allocate y");
+    DIS();
+    char *x = (char *)GC_malloc(1000);
+    printf("\n[+] allocate x ");
+	DIS();
 	GC_free(y);
+	printf("\n[+] free y");
+    DIS();
     char *v = (char *)GC_malloc(100);
+    printf("\n[+] allocate v ");
+	DIS();
 	char *z = (char *)GC_malloc(300);
+	printf("\n[+] allocate z ");
+	DIS();
 	GC_free(z);
+	printf("\n[+] free z ");
+	DIS();
 	char *e = (char *)GC_malloc(300);
+	printf("\n[+] allocate e ");
+	DIS();
 	char *f = (char *)GC_malloc(700);
-
+	printf("\n[+] allocate f ");
+	DIS();
+	
     e = NULL;
 	f = NULL;
 	
-	printf("[+] y pointer : \t %p \t %p \n", y - 16, &y);
+	printf("\n[+] y pointer : \t %p \t %p \n", y - 16, &y);
 	printf("[+] x pointer : \t %p \t %p \n", x - 16, &x);
 	printf("[+] v pointer : \t %p \t %p \n", v - 16, &v);
 	printf("[+] z pointer : \t %p \t %p \n", z - 16, &z);
@@ -294,7 +340,10 @@ int main ()
 
     GC_collect();
 	
-	printf("\n[+] garbage_collect \n");
+	printf("\n[+] garbage_collect ");
+	DIS();
+	
+	printf("\n");
 
     return 0;
 }
