@@ -178,24 +178,26 @@ void GC_free (void *ptr) {
 static void scan_region (uintptr_t *start, uintptr_t *end)	// 		scan set region and mark
 {
 
-	printf(" \n[+] scan_region method start \n");
+	printf(" \n[+] scan_region method \n");
 	printf("[+] scan start in [ %p ] - scan end in [ %p ] \n\n", start, end);
 
-	header_t *prev_block;
-	prev_block->next = usedp;
+	header_t *block;
 
 	//		end here take care abovt prev_block->next not ( | 1) fix ......
 
 	while ((uintptr_t)start < (uintptr_t) end) {
 				
-		for (block = usedp; UNTAG(block) != NULL;
-		 untag_block = UNTAG(block), block = untag_block->next ) {			
-			if ((uintptr_t) prev_block->next == (uintptr_t) ((header_t *)*start - 1)) {
-				printf("[+] find block : [ %p ] \n", (header_t *)*start - 1);
-				prev_block->next = (header_t *)((uintptr_t) block | 1);
-				
-			}
+		
+		if ((uintptr_t) usedp == (uintptr_t) ((header_t *)*start - 1))
+			usedp = (header_t *)((uintptr_t) usedp | 1);
+	
+		for (block = UNTAG(usedp); block->next != NULL;	block = UNTAG(block->next)) {
+			if((uintptr_t)block->next == (uintptr_t) ((header_t *)*start - 1)) {
+				printf("[+] block->next : [ %p ]\n", block->next);
+				block->next = (header_t *)((uintptr_t) block->next | 1);
+			} 
 		}
+		
 		(uintptr_t) start++;
 	}
 	
@@ -224,12 +226,43 @@ static void collect () {	//		collect unmarked blocks
 	header_t *block;
 	header_t *untag_block;
 	
-	for (block = usedp; UNTAG(block) != NULL; untag_block = UNTAG(block), block = UNTAG(untag_block->next))
-		if (block == UNTAG(block)) 
-			GC_free(UNTAG(block) + 1);
+	int block_array_size = 0;
+	int flag_usedp = 0;
+	
+	// 	check first blokc and set as UNTAG()
+	if ((uintptr_t)usedp == (uintptr_t)UNTAG(usedp)) {
+		block_array_size++;
+		flag_usedp = 1;
+	} else {
+		usedp = UNTAG(usedp);
+	}
+	
+	//	count how many block in used list are untag
+	for (block = usedp->next, untag_block = UNTAG(block); UNTAG(untag_block->next) != NULL; block = untag_block->next, untag_block = UNTAG(block))
+		if ((uintptr_t)block == (uintptr_t)UNTAG(block)) 
+			block_array_size++;
 			
-	for (block = UNTAG(usedp); UNTAG(block) != NULL; untag_block = UNTAG(block), block = UNTAG(untag_block->next))
-		block = UNTAG(block);
+	header_t *untag_block_array[block_array_size];	//	array for untag blocks
+	
+	//	fill our array with untag blocks
+	int i = 0;
+	for (block = usedp->next, untag_block = UNTAG(block); UNTAG(untag_block->next) != NULL; block = untag_block->next, untag_block = UNTAG(block))
+		if ((uintptr_t)block == (uintptr_t)UNTAG(block)) {
+			untag_block_array[i] = UNTAG(block);
+			i++;
+	}
+	
+	//	check and add our first block if it is untag	
+	if (flag_usedp)
+		untag_block_array[i] = usedp;
+	
+	//	make all block normal without 01
+	for (block = usedp->next; UNTAG(block->next) != NULL; block = UNTAG(block->next))
+		block->next = UNTAG(block->next);
+		
+	//	free all block whitch are in our array	
+	for (int i = 0; i < block_array_size; i++) 
+		GC_free(untag_block_array[i] + 1);
 	
 }
 
@@ -273,9 +306,11 @@ void GC_collect()
 	GC_init();	
 
     /* Scan the BSS and initialized data segments. */
+    printf("\n[+] scan BSS and data \n\n");
     scan_region((uintptr_t *)&etext, (uintptr_t *)&end);
 
     /* Scan the stack. */
+    printf("\n[+] scan stack \n\n");
     asm volatile ("movq %%rbp, %0" : "=r" (stack_top));
     scan_region((uintptr_t *)stack_top, (uintptr_t *)stack_bottom);
 
@@ -330,6 +365,8 @@ int main ()
 	
     e = NULL;
 	f = NULL;
+	
+	///			need more test			////
 	
 	printf("\n[+] y pointer : \t %p \t %p \n", y - 16, &y);
 	printf("[+] x pointer : \t %p \t %p \n", x - 16, &x);
