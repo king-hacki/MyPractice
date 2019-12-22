@@ -1,3 +1,20 @@
+
+/*  program with main()
+    
+    read lines from console
+    you shold set number of lines in argv
+ 
+    change all words "smth_word1" on "smth_word2"
+    "smth_word1" and "smth_word2" set in argv
+ 
+    and display result in text.txt file
+ 
+    examlpe :
+            ./a.out 8 town  city
+            take 8 lines from console and change all town words on city
+    
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
