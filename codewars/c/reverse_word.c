@@ -10,7 +10,7 @@ char *reverse_word (const char* text);
 int main () {
     
     const char *input_text0 = "some text to test";
-/*    const char *input_text1 = "Y&";
+    const char *input_text1 = "Y&";
     const char *input_text2 = "Y&wqemf erfn qjrwng lkerjgn erkjn geq";
     const char *input_text3 = "wef;kermfg;l ejnrg qg n;qwlkgn dm,sg agre";
     const char *input_text4 = "wqefweqfqwef wq fret &";
@@ -35,14 +35,14 @@ int main () {
     const char *input_text23 = "Y&3ork 43";
     const char *input_text24 = "Y&rg;ewr gm,';aefl  d''zz//23223";
     const char *input_text25 = "Y&ewrqwerwtewry gfbd";
-    const char *input_text26 = "Y&qew,.d/sde';fqew'lr ";
+    const char *input_text26 = "LT_18{5,t/gc*VZ |]ZWw[|{MLN;&&";
     const char *input_text27 = "x";
-    const char *input_text28 = "3|s4P-5?";
- */
+    const char *input_text28 = " 4Ib3n5i#I|WB  q(LWRy BBRA\-s ";
+ 
     char *reverse_text;
     
     reverse_text = reverse_word(input_text0);
-/*    reverse_text = reverse_word(input_text1);
+    reverse_text = reverse_word(input_text1);
     reverse_text = reverse_word(input_text2);
     reverse_text = reverse_word(input_text3);
     reverse_text = reverse_word(input_text4);
@@ -71,44 +71,52 @@ int main () {
     reverse_text = reverse_word(input_text27);
     reverse_text = reverse_word(input_text28);
     
-    */
     
 }
 
 char *reverse_word (const char *text) {
+
+	printf("\n[+] text : [ %s ]\n", text);
     
     int tc = 0;
-    
-    int test = 4;
-    
     int letters = 0;
     for (int i = 0; *(text + i) != '\0'; i++)
         letters++;
-    
-    printf("[+] leters : [ %d ]\n", letters);
-    
+        
     char *working_text = (char *) malloc(letters + 1);
     int wc = 0;
 
     while (TRUE) {
+    
         if (*text == ' ' || *text == '\0') {
+        
+        	int counter = 0;
             while (tc > 0) {
                 *(working_text + wc++) = *(--text);
                 tc--;
+                counter++;
             }
+            
             if (wc == letters) break;
+            
             *(working_text + wc++) = ' ';
-            text = text + wc;
+            counter++;
+            text = text + counter;
+            
         } else {
+        
             tc++;
             text++;
+            
         }
+        
     }
     
-    printf("[+] %s\n", working_text);
-
-    return text;
+    printf("[+] reverse_text : [ %s ]\n\n", working_text);
     
+    free(working_text);
+    
+    return working_text;
 }
 
 
