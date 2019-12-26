@@ -3,11 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TRUE 1
+
 char *reverse_word (const char* text);
 
 int main () {
     
-    const char *input_text1 = "Y&";
+    const char *input_text0 = "some text to test";
+/*    const char *input_text1 = "Y&";
     const char *input_text2 = "Y&wqemf erfn qjrwng lkerjgn erkjn geq";
     const char *input_text3 = "wef;kermfg;l ejnrg qg n;qwlkgn dm,sg agre";
     const char *input_text4 = "wqefweqfqwef wq fret &";
@@ -35,10 +38,11 @@ int main () {
     const char *input_text26 = "Y&qew,.d/sde';fqew'lr ";
     const char *input_text27 = "x";
     const char *input_text28 = "3|s4P-5?";
-    
+ */
     char *reverse_text;
     
-    reverse_text = reverse_word(input_text1);
+    reverse_text = reverse_word(input_text0);
+/*    reverse_text = reverse_word(input_text1);
     reverse_text = reverse_word(input_text2);
     reverse_text = reverse_word(input_text3);
     reverse_text = reverse_word(input_text4);
@@ -67,59 +71,43 @@ int main () {
     reverse_text = reverse_word(input_text27);
     reverse_text = reverse_word(input_text28);
     
-    
-    free (reverse_text);
+    */
     
 }
 
 char *reverse_word (const char *text) {
     
-   // printf("[+] text : [ %s ]\n", text);
+    int tc = 0;
+    
+    int test = 4;
     
     int letters = 0;
-    int letters_in_word = 0;
-    
     for (int i = 0; *(text + i) != '\0'; i++)
         letters++;
     
-  //  printf("[+] there are : [ %d ]  letters\n", letters);
+    printf("[+] leters : [ %d ]\n", letters);
     
-    char *working_text = (char *) malloc(letters * 8192);
-    int wtcnt = 0;
-   // printf("[+] &working_text : [ %p ]\n", &working_text);
-   // printf("[+] *working_text : [ %p ]\n", working_text);
-    
-    for (int i = 0; i < letters + 1; i++) {
-        if (text[i] == ' ' || text[i] == '\0') {
-            
-            char *word = (char *)malloc(letters_in_word);
-            
-  //          printf("[+] i : [ %d ]\t letters in word : [ %d ]\n", i, letters_in_word);
-            for (int j = letters_in_word - 1 + i - letters_in_word, k = 0; j >= 0; j--, k++)
-                *(word + k) = text[j];
-            
-    //        printf("[+] reverse word : [ %s ]\n", word);
-            
-            for (int j = 0; j < letters_in_word; j++)
-                working_text[wtcnt++] = word[j];
-             
-            
-            
-            if (text[i] != '\0')
-                working_text[wtcnt++] = ' ';
-            
-      //      printf("[+] working_text : [ %s ]\n", working_text);
-            
-            letters_in_word = 0;
-           
-           free(word);
-        } else  letters_in_word++;
-    }
+    char *working_text = (char *) malloc(letters + 1);
+    int wc = 0;
 
-    printf("\n[+] %s\n", text);
-    printf("[+] %s\n", working_text);
+    while (TRUE) {
+        if (*text == ' ' || *text == '\0') {
+            while (tc > 0) {
+                *(working_text + wc++) = *(--text);
+                tc--;
+            }
+            if (wc == letters) break;
+            *(working_text + wc++) = ' ';
+            text = text + wc;
+        } else {
+            tc++;
+            text++;
+        }
+    }
     
-    return working_text;
+    printf("[+] %s\n", working_text);
+
+    return text;
     
 }
 
