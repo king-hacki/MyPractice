@@ -15,15 +15,15 @@ int main () {
 }
 
 char *reverse_word (const char *text) {
-  
-    printf("\n[+] text : [ %s ]\n", text);
+
+	printf("\n[+] text : [ %s ]\n", text);
     
     int tc = 0;
     int letters = 0;
     for (int i = 0; *(text + i) != '\0'; i++)
         letters++;
     printf("[+] letters : [ %d ]\n", letters);
-        
+    
     char *working_text = (char *) malloc(letters + 1);
     int wc = 0;
 
