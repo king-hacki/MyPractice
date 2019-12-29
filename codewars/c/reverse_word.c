@@ -14,6 +14,8 @@ int main () {
     reverse_text = reverse_word(input_text0);
 }
 
+///                     923ms
+
 char *reverse_word (const char *text) {
 
 	printf("\n[+] text : [ %s ]\n", text);
