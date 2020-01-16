@@ -1,4 +1,4 @@
-package builder_pattern_item_2;
+package item_2_builder_pattern;
 
 public class JavaBeansPattern {
 

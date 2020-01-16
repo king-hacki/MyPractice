@@ -1,10 +1,10 @@
-package builder_pattern_item_2;
+package item_2_builder_pattern;
 
 public class BuilderPattern {
 
 	public static void main(String[] args) {
 		
-		System.out.println("[ + ] Builder pattern start work : ");
+		System.out.println("[ + ] Builder pattern start work : \n");
 		
 		Car c1 = new Car.Builder().engine(3).build();
 		Car c2 = new Car.Builder().engine(3).mark(10).build();

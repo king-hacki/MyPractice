@@ -8,7 +8,7 @@
  */
 
 
-package static_factory_item_1;
+package item_1_static_factory;
 
 public class StaticFactory {
 
