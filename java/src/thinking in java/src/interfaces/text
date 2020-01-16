@@ -1,0 +1,28 @@
+
+
+Abstract classes
+
+
+If you have an abstract class like Instrument, objects of that specific class almost always have no meaning.
+You create an abstract class when you want to manipulate a set of classes through its common interface.
+Thus, Instrument is meant to express only the interface, and not a particular implementation, 
+so creating an Instrument object makes no sense, and you’ll probably want to prevent the user from doing it. 
+This can be accomplished by making all methods in Instrument generate errors, 
+but that delays the information until run time and requires reliable exhaustive testing on the user’s part. 
+It’s usually better to catch problems at compile time.
+  
+A class containing abstract methods is called an abstract class. If a class contains one or more abstract methods, 
+the class itself must be qualified as abstract. (Otherwise, the compiler gives you an error message.)
+
+
+Interface
+
+
+The interface keyword takes the concept of abstractness one step further. 
+The abstract keyword allows you to create one or more undefined methods in a class—you provide part of 
+the interface without providing a corresponding implementation. The implementation is provided by inheritors. 
+The interface keyword produces a completely abstract class, one that provides no implementation at all. 
+It allows the creator to determine method names, argument lists, and return types, but no method bodies. 
+An interface provides only a form, but no implementation.
+  
+  
