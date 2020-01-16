@@ -18,5 +18,7 @@ class StaticTest {
 		System.out.println("[ + ] in noiinstantiability class and x = " + x);
 	}
 	
-	private StaticTest(){}
+	private StaticTest(){}		//	close our class
 }
+
+//	class TestInheritance extends StaticTest{}	//	can't do this because of constructor is private in parent
