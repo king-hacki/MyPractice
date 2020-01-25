@@ -7,7 +7,7 @@ package polymorphism;
 * Explain what happens.
 */
 
-public class Ex_10 {
+public class Ex_10_goodShowOfPolimorphism {
 
 	public static void main(String[] args) {
 

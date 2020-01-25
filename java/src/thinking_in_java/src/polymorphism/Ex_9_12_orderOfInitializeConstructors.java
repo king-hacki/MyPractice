@@ -8,15 +8,17 @@ package polymorphism;
 * specific types of Rodents, and call your base-class methods to see what 
 * happens.
 */
-public class Ex_9 {
+
+//TIJ4 Chapter Polymorphism, Exercise 12, page 298
+/* Modify exercise 9 so that it demonstrates the order of initialization of the 
+* base classes and derived classes. Now add member objects to both the base and
+* derived classes, and show the order in which their initialization occurs during
+* construction.
+*/
+
+public class Ex_9_12_orderOfInitializeConstructors {
 	
 	static Animal [] animals = {
-			new Bird(),
-			new Mammal(),
-			new Fish(),
-			new Fish(),
-			new Bird(),
-			new Fish(),
 			new Mammal(),
 			new Bird(),
 			new Mammal(),
@@ -38,24 +40,38 @@ public class Ex_9 {
 }
 
 
+class Characteristic {
+	private String ch;
+	Characteristic (String ch) {
+		this.ch = ch;
+		System.out.println(this.ch);
+	}
+}
+
 class Animal {
+	
+	Characteristic charac = new Characteristic("All animal's characteristics");
 	
 	void move () {
 		System.out.println("Animal move");
 	}
 	void life () {
 		System.out.println("Animal life");
+	}	
+	Animal () {
+		System.out.println("Animal has been created");
 	}
-	
 }
 
 class Bird extends Animal {
 	void move () {
 		System.out.println("Bird move");
 	}
-	
 	void life () {
 		System.out.println("Bird life");
+	}
+	Bird () {
+		System.out.println("Bird has been created");
 	}
 }
 
@@ -64,7 +80,10 @@ class Mammal extends Animal {
 		System.out.println("Mammal move");
 	}
 	void life () {
-		System.out.println("Animal life");
+		System.out.println("Mammal life");
+	}
+	Mammal () {
+		System.out.println("Mammal has been created");
 	}
 }
 
@@ -74,6 +93,9 @@ class Fish extends Animal {
 	}
 	void life () {
 		System.out.println("Fish life");
+	}
+	Fish () {
+		System.out.println("Fish has been created");
 	}
 }
 
