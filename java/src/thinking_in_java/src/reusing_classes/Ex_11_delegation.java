@@ -5,6 +5,11 @@ public class Ex_11_delegation {
 	public static void main(String[] args) {
 		DelgedDogFromMan dog = new DelgedDogFromMan();
 		dog.walk();
+		
+	}
+	
+	public static DelgedDogFromMan getDelgedDogFromMan () {
+		return new DelgedDogFromMan();
 	}
 
 }

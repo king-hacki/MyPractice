@@ -1,0 +1,27 @@
+
+
+Method-call binding
+
+
+Connecting a method call to a method body is called binding. When binding is performed before the program is run (by the compiler and linker, if there is one), it’s called early binding. You might not have heard the term before because it has never been an option with procedural languages. C compilers have only one kind of method call, and that’s early binding.
+
+The confusing part of the preceding program revolves around early binding, because the compiler cannot know the correct method to call when it has only an Instrument reference.
+
+The solution is called late binding, which means that the binding occurs at run time, based on the type of object. Late binding is also called dynamic binding or runtime binding. When a language implements late binding, there must be some mechanism to determine the type of the object at run time and to call the appropriate method. That is, the compiler still doesn’t know the object type, but the method-call mechanism finds out and calls the correct method body. The late-binding mechanism varies from language to language, but you can imagine that some sort of type information must be installed in the objects.
+
+All method binding in Java uses late binding unless the method is static or final (private methods are implicitly final). This means that ordinarily you don’t need to make any decisions about whether late binding will occur—it happens automatically.
+
+Why would you declare a method final? As noted in the last chapter, it prevents anyone from overriding that method. Perhaps more important, it effectively “turns off” dynamic binding, or rather it tells the compiler that dynamic binding isn’t necessary. This allows the compiler to generate slightly more efficient code for final method calls. However, in most cases it won’t make any overall performance difference in your program, so it’s best to only use final as a design decision, and not as an attempt to improve performance.
+
+Pitfall: “overriding” private methods
+
+The result of this is that only non-private methods may be overridden, but you should watch out for the appearance of overriding private methods, which generates no compiler warnings, but doesn’t do what you might expect. To be clear, you should use a different name from a private base-class method in your derived class.
+
+
+
+Pitfall: “overriding” private methods
+
+If a method is static, it doesn’t behave polymorphically
+
+
+
