@@ -1,5 +1,11 @@
 package polymorphism;
 
+//TIJ4 Chapter Polymorphism, Exercise 16, page 306
+/* Following the example in Transmogrify.java, create a Starship class
+* containing an AlertStatus reference that can indicate three different states.
+* Include methods to change the states.
+*/
+
 public class Ex_16_states {
 
 	public static void main(String[] args) {
@@ -13,6 +19,7 @@ public class Ex_16_states {
 		status.showAlert();
 		status.changeMiddle();
 		status.showAlert();
+		
 	}
 
 }

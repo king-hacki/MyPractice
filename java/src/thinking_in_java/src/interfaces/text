@@ -25,4 +25,153 @@ The interface keyword produces a completely abstract class, one that provides no
 It allows the creator to determine method names, argument lists, and return types, but no method bodies. 
 An interface provides only a form, but no implementation.
   
-  
+
+Complete decoupling
+
+
+Whenever a method works with a class instead of an interface, you are limited to using that class or its subclasses. If you would like to apply the method to a class that isn’t in that hierarchy, you’re out of luck. An interface relaxes this constraint considerably. As a result, it allows you to write more reusable code.
+ 
+For example, suppose you have a Processor class that has a name( ) and a process( ) method that takes input, modifies it and produces output. The base class is extended to create different types of Processor. In this case, the Processor subtypes modify String objects (note that the return types can be covariant, but not the argument types):
+
+The Apply.process( ) method takes any kind of Processor and applies it to an Object, then prints the results. Creating a method that behaves differently depending on the argument object that you pass it is called the Strategy design pattern. The method contains the fixed part of the algorithm to be performed, and the Strategy contains the part that varies. The Strategy is the object that you pass in, and it contains code to be executed. Here, the Processor object is the Strategy, and in main( ) you can see three different Strategies applied to the String s.
+
+Now suppose you discover a set of electronic filters that seem like they could fit into your Apply.process( ) method:
+
+Filter has the same interface elements as Processor, but because it isn’t inherited from Processor—because the creator of the Filter class had no clue you might want to use it as a Processor—you can’t use a Filter with the Apply.process( ) method, even though it would work fine. Basically, the coupling between Apply.process( ) and Processor is stronger than it needs to be, and this prevents the Apply.process( ) code from being reused when it ought to be. Also notice that the inputs and outputs are both Waveforms. 
+
+If Processor is an interface, however, the constraints are loosened enough that you can reuse an Apply.process( ) that takes that interface. Here are the modified versions of Processor and Apply:
+
+
+Name collisions when combining Interfaces
+
+
+//: interfaces/InterfaceCollision.java package interfaces;
+interface I1 { void f(); }
+interface I2 { int f(int i); }
+interface I3 { int f(); }
+class C { public int f() { return 1; } }
+class C2 implements I1, I2 {
+public void f() {}
+public int f(int i) { return 1; } // overloaded
+}
+class C3 extends C implements I2 {
+  public int f(int i) { return 1; } // overloaded
+}
+class C4 extends C implements I3 { // Identical, no problem:
+  public int f() { return 1; }
+}
+// Methods differ only by return type: 
+//! class C5 extends C implements I1 {} 
+//! interface I4 extends I1, I3 {} ///:~
+
+The difficulty occurs because overriding, implementation, and overloading get unpleasantly mixed together. Also, overloaded methods cannot differ only by return type. When the last two lines are uncommented, the error messages say it all:
+
+InterfaceCollision.java:23: f() in C cannot implementf() in It; attempting to use incompatible return type
+found: int
+required: void
+InterfaceCollision.java:24: Interfaces I3 andh are incompatible; both define f(), but with different return type
+
+Using the same method names in different interfaces that are intended to be combined generally causes confusion in the readability of the code, as well. Strive to avoid it.
+
+
+Adapting to an interface
+
+
+Thus, a common use for interfaces is the aforementioned Strategy design pattern. You write a method that performs certain operations, and that method takes an interface that you also specify. You’re basically saying, "You can use my method with any object you like, as long as your object conforms to my interface." This makes your method more flexible, general and reusable.
+
+Because you can add an interface onto any existing class in this way, it means that a method that takes an interface provides a way for any class to be adapted to work with that method. This is the power of using interfaces instead of classes.
+
+
+Initializing fields in interfaces
+
+
+Fields defined in interfaces cannot be "blank finals," but they can be initialized with non- constant expressions.
+
+Since the fields are static, they are initialized when the class is first loaded, which happens when any of the fields are accessed for the first time
+
+The fields, of course, are not part of the interface. The values are stored in the static storage area for that interface.
+
+
+Interfaces and factories
+
+
+An interface is intended to be a gateway to multiple implementations, and a typical way to produce objects that fit the interface is the Factory Method design pattern. Instead of calling a constructor directly, you call a creation method on a factory object which produces an implementation of the interface—this way, in theory, your code is completely isolated from the implementation of the interface, thus making it possible to transparently swap one implementation for another. Here’s a demonstration showing the structure of the Factory Method:
+
+Without the Factory Method, your code would somewhere have to specify the exact type of Service being created, so that it could call the appropriate constructor.
+
+Why would you want to add this extra level of indirection? One common reason is to create a framework. Suppose you are creating a system to play games; for example, to play both chess and checkers on the same board:
+
+
+interface Game { 
+	boolean move(); 
+}
+
+interface GameFactory { 
+	Game getGame(); 
+}
+
+class Checkers implements Game { 
+	private int moves = 0;
+	private static final int MOVES = 3; 
+	public boolean move() {
+		print("Checkers move " + moves);
+		return ++moves != MOVES; 
+	}
+}
+
+class CheckersFactory implements GameFactory {
+	public Game getGame() { 
+		return new Checkers(); 
+	}
+}	
+
+class Chess implements Game { 
+	private int moves = 0;
+	private static final int MOVES = 4; 
+	public boolean move() {
+		print("Chess move " + moves);
+		return ++moves != MOVES; 
+	}
+}
+
+class ChessFactory implements GameFactory {
+	public Game getGame() { 
+		return new Chess(); 
+	}
+}
+
+public class Games {
+	public static void playGame(GameFactory factory) {
+		Game s = factory.getGame(); while(s.move()); 
+	}
+
+	public static void main(String[] args) {
+		playGame(new CheckersFactory());
+		playGame(new ChessFactory());
+	}
+}
+ /* Output: 
+Checkers move 0 
+Checkers move 1 
+Checkers move 2 
+Chess move 0 
+Chess move 1 
+Chess move 2 
+Chess move 3 
+*///:~
+
+
+If the Games class represents a complex piece of code, this approach allows you to reuse that code with different types of games. You can imagine more elaborate games that can benefit from this pattern. In the next chapter, you’ll see a more elegant way to implement the factories using anonymous inner classes.
+
+
+Summary
+
+
+It is tempting to decide that interfaces are good, and therefore you should always choose interfaces over concrete classes. Of course, almost anytime you create a class, you could instead create an interface and a factory.
+
+Many people have fallen to this temptation, creating interfaces and factories wherever it’s possible. The logic seems to be that you might need to use a different implementation, so you should always add that abstraction. It has become a kind of premature design optimization.
+
+Any abstraction should be motivated by a real need. Interfaces should be something you refactor to when necessary, rather than installing the extra level of indirection everywhere, along with the extra complexity. That extra complexity is significant, and if you make someone work through that complexity only to realize that you’ve added interfaces "just in case" and for no compelling reason—well, if I see such a thing I begin to question all the designs that this particular person has done.
+
+An appropriate guideline is to prefer classes to interfaces. Start with classes, and if it becomes clear that interfaces are necessary, then refactor. Interfaces are a great tool, but they can easily be overused.
+

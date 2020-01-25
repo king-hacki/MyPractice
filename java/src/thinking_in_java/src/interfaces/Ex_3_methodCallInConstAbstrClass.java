@@ -9,7 +9,7 @@ package interfaces;
 * print() method. Explain the results.
 */ 
 
-public class Ex_3 {
+public class Ex_3_methodCallInConstAbstrClass {
 
 	public static void main(String[] args) {
 	
@@ -21,12 +21,21 @@ public class Ex_3 {
 		* 5. Body of Derived() called
 		* 6. Derived.print() called (derived.x = 1)
 		*/
+		
 		Derived derived = new Derived();	
 		derived.print();	
+		
+		Base b = new Derived();
+		derived.test();
+//		b.test();
+		b.print();
+
 	}
 
 }
 abstract class Base {
+	
+	void test () { System.out.println("good test");}
 	protected abstract void print ();
 	Base() {
 		print();
@@ -37,6 +46,7 @@ class Derived extends Base{
 	protected void print() {
 		System.out.println("Derived.x = " + x);
 	}
+	void test () { System.out.println("bad test");}
 }
 
 

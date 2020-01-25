@@ -32,6 +32,7 @@ public class Ex_1_5_cycle {
 		tric.ride(c);
 */	
 		
+		
 		Cycle c = new Cycle();
 		
 		
