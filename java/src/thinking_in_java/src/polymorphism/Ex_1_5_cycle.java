@@ -35,7 +35,6 @@ public class Ex_1_5_cycle {
 		
 		Cycle c = new Cycle();
 		
-		
 		Cycle bc = new Bicycle();
 		Cycle uc = new Unicycle();
 		Cycle tc = new Tricycle();
@@ -47,6 +46,9 @@ public class Ex_1_5_cycle {
 		
 		Bicycle bc2 = new Bicycle();
 		System.out.println(ride(bc2));
+		
+		bc2.testBicycle();
+//		bc.testBicycle();		error
 	}
 
 }
@@ -94,6 +96,10 @@ class Bicycle extends Cycle {
 	
 	public int wheels () { 
 		return wheels; 
+	}
+	
+	public void testBicycle() {
+		System.out.println("Testing Bicycle");
 	}
 	 
 }
