@@ -1,0 +1,32 @@
+
+
+Inner Classes
+
+
+
+It’s possible to place a class definition within another class definition. This is called an inner class
+
+
+The inner class is a valuable feature because it allows you to group classes that logically belong together and to control the visibility of one within the other. However, it’s important to understand that inner classes are distinctly different from composition.
+
+At first, inner classes look like a simple code-hiding mechanism: You place classes inside other classes. You’ll learn, however, that the inner class does more than that—it knows about and can communicate with the surrounding class—and the kind of code you can write with inner classes is more elegant and clear, although there’s certainly no guarantee of this.
+
+Initially, inner classes may seem odd, and it will take some time to become comfortable using them in your designs. The need for inner classes isn’t always obvious, but after the basic syntax and semantics of inner classes have been described, the section "Why inner classes?" should begin to make clear the benefits of inner classes.
+
+After that section, the remainder of the chapter contains more detailed explorations of the syntax of inner classes. These features are provided for language completeness, but you might not need to use them, at least not at first. So the initial parts of the chapter might be all you need for now, and you can leave the more detailed explorations as reference material.
+
+So an inner class has automatic access to the members of the enclosing class. How can this happen? The inner class secretly captures a reference to the particular object of the enclosing class that was responsible for creating it. Then, when you refer to a member of the enclosing class, that reference is used to select that member. Fortunately, the compiler takes care of all these details for you, but now you can see that an object of an inner class can be created only in association with an object of the enclosing class (when, as you shall see, the inner class is non-static). Construction of the inner-class object requires the reference to the object of the enclosing class, and the compiler will complain if it cannot access that reference. Most of the time this occurs without any intervention on the part of the programmer.
+
+
+Inner classes in methods and scopes
+
+
+Inner classes can be created within a method or even an arbitrary scope. There are two reasons for doing this:
+
+1. As shown previously, you’re implementing an interface of some kind so that you can create and return a reference.
+
+2. You solving a complicated problem and you want to create a class to aid in your solution, but you don’t want it publicly available.
+
+Local inner class - the creation of an entire class within the scope of a method(instead of the scope of another class).
+
+
