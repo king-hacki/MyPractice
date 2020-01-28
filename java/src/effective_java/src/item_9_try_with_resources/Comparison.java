@@ -20,7 +20,7 @@ class TryFinally {
 		}
 	}
 }
-
+//	it is not good because AutoCloseable use were there are method close()
 class TryWithResources implements AutoCloseable {
 	static void compare () { 
 		System.out.println(Math.sqrt(-2));

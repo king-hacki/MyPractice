@@ -41,6 +41,11 @@ public class Ex_10_goodShowOfPolimorphism {
 		System.out.println(stt.x);
 		System.out.println(stt.getX());
 		System.out.println("----------------");
+		
+		Base bd1 = new Derived();
+		bd1.second();
+		bd1 = new Derived2();		//		with polimorphism we can do this
+		bd1.second();
 	}
 
 }
@@ -58,6 +63,12 @@ class Base {
 class Derived extends Base {	
 	void second() {
 		System.out.println("Derived method second has called");
+	}
+}
+
+class Derived2 extends Base {	
+	void second() {
+		System.out.println("Derived2 method second has called");
 	}
 }
 

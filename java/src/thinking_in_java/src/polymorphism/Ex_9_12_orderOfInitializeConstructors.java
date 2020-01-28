@@ -18,7 +18,7 @@ package polymorphism;
 
 public class Ex_9_12_orderOfInitializeConstructors {
 	
-	static Animal [] animals = {
+	public static Animal [] animals = {
 			new Mammal(),
 			new Bird(),
 			new Mammal(),
@@ -73,6 +73,10 @@ class Bird extends Animal {
 	Bird () {
 		System.out.println("Bird has been created");
 	}
+	
+	public static Bird getMammal () {
+		return new Bird();
+	}
 }
 
 class Mammal extends Animal {
@@ -85,6 +89,10 @@ class Mammal extends Animal {
 	Mammal () {
 		System.out.println("Mammal has been created");
 	}
+	
+	public static Mammal getMammal () {
+		return new Mammal();
+	}
 }
 
 class Fish extends Animal {
@@ -96,6 +104,10 @@ class Fish extends Animal {
 	}
 	Fish () {
 		System.out.println("Fish has been created");
+	}
+	
+	public static Fish getMammal () {
+		return new Fish();
 	}
 }
 
