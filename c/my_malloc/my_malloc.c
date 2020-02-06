@@ -1,17 +1,15 @@
-тест
-
 #include <stdio.h>
 #include <unistd.h>
 
 struct meta {
 	
-        int size;		// 4 byte
-        int free;		// 4 byte
-        struct meta *next;	// 8 byte
-	struct meta *prev;	// 8 byte
-        void *ptr;		// 8 byte
-				// 32 byte
-        char end[1];
+        int         	size;		// 4 byte
+        int             free;		// 4 byte
+        struct meta     *next;	    // 8 byte
+        struct meta     *prev;	    // 8 byte
+        void            *ptr;		// 8 byte
+                                    // 32 byte
+        char            end[1];
 };
 
 typedef struct meta *meta;
@@ -146,11 +144,11 @@ void split_block (meta block, int size) {
         temp_size = block->size;
         block->size = size;
         new_block->size = temp_size - size - META_SIZE * 4;
-	block->next->prev = new_block;
+        block->next->prev = new_block;
         new_block->next = block->next;
         new_block->prev = block;
         block->next = new_block;
-	block->free = 0;
+        block->free = 0;
 
 	if (new_block->next->free) {
 		block = fusion(block);
@@ -200,7 +198,7 @@ meta extend_memory (meta last, int size) {
                 block->prev = block;
                 block->next = block;
         }
-
+ 
         return block;
 }
 
