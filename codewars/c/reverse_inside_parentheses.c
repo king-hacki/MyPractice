@@ -3,7 +3,8 @@
     1) Create Tree for our datas;
     2) Write Datas to Tree's nodes;
     3) Work with our datas;
-    4) Create output data
+    4) Reverse children array;
+    5) Create output data
  
  */
 
@@ -11,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+///         910 ms
 char *reverse_inside_parentheses (char *text) {
     
     struct node {
@@ -21,6 +22,7 @@ char *reverse_inside_parentheses (char *text) {
         int             nodes_check;
         int             is_used;
         int             do_reverse;
+        int             children_reverse;
         struct node     *parent;
         struct node     **children;
         char            *text;
@@ -38,6 +40,7 @@ char *reverse_inside_parentheses (char *text) {
             count_node++;
     root = (node) calloc(1, sizeof(struct node));
     root->end = 0;
+    root->children_reverse = 1;
     root->nodes_check = 1;
     root->node_end = 0;
     root->is_used = 0;
@@ -53,6 +56,7 @@ char *reverse_inside_parentheses (char *text) {
                 if (current->children[j] == NULL) {
                     current->children[j] = (node) calloc(1, sizeof(struct node));
                     current->children[j]->end = 0;
+                    current->children[j]->children_reverse = 1;
                     current->children[j]->nodes_check = 1;
                     current->children[j]->node_end = 0;
                     current->children[j]->is_used = 0;
@@ -111,10 +115,13 @@ char *reverse_inside_parentheses (char *text) {
             current = current->children[current->node_end];
             current->parent->node_end += 1;
         } else
-            if (current->parent != NULL)
+            if (current->parent != NULL) {
+                current->node_end = 0;
                 current = current->parent;
-            else
+            } else {
+                current->node_end = 0;
                 break;
+            }
         if (current->do_reverse && current->is_used) {
             char *work_text = (char *) calloc(strlen(text), sizeof(char));
             int j = 0;
@@ -128,15 +135,38 @@ char *reverse_inside_parentheses (char *text) {
                         work_text[i++] = '(';
                 else
                     work_text[i++] = current->text[j];
-            
             strcpy(current->text, work_text);
-            free(work_text);
+    //        free(work_text);
         }
         current->is_used = 0;
     }
 
     
 // 4
+    current = root;
+    while (1) {
+        
+        if (current->do_reverse && current->nodes_check != 0 && current->children_reverse) {
+            node *reverse_children = (node *) calloc(count_node, sizeof(struct node));
+            for (int i = 0; i < current->nodes_check; i++)
+                reverse_children[i] = current->children[current->nodes_check - i - 1];
+            current->children = reverse_children;
+            current->children_reverse = 0;
+        }
+        if (current->node_end < current->nodes_check) {
+            current = current->children[current->node_end];
+            current->parent->node_end += 1;
+        } else
+            if (current->parent != NULL) {
+                current->node_end = 0;
+                current = current->parent;
+            } else {
+                current->node_end = 0;
+                break;
+            }
+    }
+    
+// 5
     
     char *work_text = (char *) calloc(strlen(text), sizeof(char));
     char *begin_of_work_text = work_text;
@@ -166,17 +196,45 @@ char *reverse_inside_parentheses (char *text) {
         }
     }
     
+    *work_text = '\0';
+
     return begin_of_work_text;
 }
 
 int main () {
+ /*
+    printf("\n[ + ] text : hod(nh(x)(el)oyd)xlu\n");
+    printf("[ + ] reverse : %s\n", reverse_inside_parentheses("hod(nh(x)(el)oyd)xlu"));
+ 
+    printf("[ + ] text : h(el)lo\n");
+    printf("[ + ] reverse : %s\n", reverse_inside_parentheses("h(el)lo"));
     
-    //printf("[ + ] text : %s\n", reverse_inside_parentheses("h(el)lo"));
-    //printf("[ + ] text : %s\n", reverse_inside_parentheses("a ((d e) c b)"));
-    //printf("[ + ] text : %s\n", reverse_inside_parentheses("one (two (three) four)"));
-    //printf("[ + ] text : %s\n", reverse_inside_parentheses("one (ruof ((rht)ee) owt)"));
-    printf("[ + ] (so(me)) (text (to) (te(st)(brt))) in (this) pro(gra)m\n");
-    printf("[ + ] text : %s\n", reverse_inside_parentheses("(so(me)) (text (to) (te(st)(brt))) in (this) pro(gra)m"));
-    //printf("[ + ] text : %s\n", reverse_inside_parentheses("some (text to (test)) (in more (test in (this (pl(a)c(e))))) this pro(gra)m"));
+    printf("[ + ] a ((d e) c b)\n");
+    printf("[ + ] text : %s\n", reverse_inside_parentheses("a ((d e) c b)"));
     
+    printf("[ + ] text : one (two (three) four)\n");
+    printf("[ + ] reverse : %s\n", reverse_inside_parentheses("one (two (three) four)"));
+    
+    printf("[ + ] text : one (two (three) four)\n");
+    printf("[ + ] reverse : %s\n", reverse_inside_parentheses("one (two (three) four)"));
+   
+    printf("\n[ + ] text : (so(me)) (text (to) (te(st)(brt))) in (this) pro(gra)m\n");
+    printf("[ + ] reverse : %s\n", reverse_inside_parentheses("(so(me)) (text (to) (te(st)(brt))) in (this) pro(gra)m"));
+   
+    printf("\n[ + ] some (text to (test)) (in more (test in (this (pl(a)c(e))))) this pro(gra)m\n");
+    printf("[ + ] text : %s\n", reverse_inside_parentheses("some (text to (test)) (in more (test in (this (pl(a)c(e))))) this pro(gra)m"));
+   
+    
+    printf("\n[ + ] some (text (t0)) and (test (in) text)\n");
+    printf("[ + ] text : %s\n", reverse_inside_parentheses("some (text (t0)) and (test (in) text)"));
+    
+    printf("\n[ + ] some (te(xt)) to (te(st)) and (again)\n");
+        printf("[ + ] text : %s\n", reverse_inside_parentheses("some (te(xt)) to (te(st)) and (again)"));
+
+    printf("\n[ + ] one (ruof ((rht)ee) owt)\n");
+    printf("[ + ] text : %s\n", reverse_inside_parentheses("one (ruof ((rht)ee) owt)"));
+  */
+    
+    printf("\n[ + ] dv(z((ow)l)han)(wpyk)uaizkr(al)((x)ix)nt\n");
+    printf("[ + ] text : %s\n", reverse_inside_parentheses("dv(z((ow)l)han)(wpyk)uaizkr(al)((x)ix)nt"));
 }
