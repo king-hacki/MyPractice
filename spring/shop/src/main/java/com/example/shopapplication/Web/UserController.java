@@ -45,6 +45,7 @@ public class UserController {
         if(errorMap != null) return errorMap;
 
         return userService.createNewUser(signupRequest);
+
     }
 
     @PostMapping("/signIn")

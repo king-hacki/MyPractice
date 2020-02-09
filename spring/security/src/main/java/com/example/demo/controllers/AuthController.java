@@ -1,4 +1,4 @@
-package com.example.demo.repository.controllers;
+package com.example.demo.controllers;
 
 import com.example.demo.payloads.request.LoginRequest;
 import com.example.demo.payloads.request.SignupRequest;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,7 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    AuthenticationManager authenticationManagerBean;
 
     @Autowired
     UserRepository userRepository;
@@ -51,7 +50,7 @@ public class AuthController {
     @PostMapping(path = "/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+        Authentication authentication = authenticationManagerBean.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
                 loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
