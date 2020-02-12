@@ -40,11 +40,11 @@ class ProjectBoard extends Component {
                         { 
                             //<!-- SAMPLE PROJECT TASK STARTS HERE --> 
                         }
-
+                        <ProjectTaskItem />
                         { 
                             //<!-- SAMPLE PROJECT TASK ENDS HERE --> 
                         }
-                        <ProjectTaskItem />
+                        
                         
                     </div>
                     <div className="col-md-4">
@@ -56,10 +56,10 @@ class ProjectBoard extends Component {
                         { 
                             //<!-- SAMPLE PROJECT TASK STARTS HERE --> 
                         }
-
+                        <ProjectTaskItem /> 
                         { //<!-- SAMPLE PROJECT TASK ENDS HERE --> 
                         }
-                        <ProjectTaskItem /> 
+
                     </div>
                 </div>
             </div>

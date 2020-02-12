@@ -114,10 +114,22 @@ If you want only stack behavior, inheritance is inappropriate here because it wo
 
 Set
 
-
 A Set refuses to hold more than one instance of each object value. If you try to add more than one instance of an equivalent object, the Set prevents duplication. The most common use for a Set is to test for membership, so that you can easily ask whether an object is in a Set. Because of this, lookup is typically the most important operation for a Set, so you’ll usually choose a HashSet implementation, which is optimized for rapid lookup.
 
 Set has the same interface as Collection, so there isn’t any extra functionality like there is in the two different types of List. Instead, the Set is exactly a Collection—it just has different behavior. (This is the ideal use of inheritance and polymorphism: to express different behavior.) A Set determines membership based on the "value" of an object, a more complex topic that you will learn about in the Containers in Depth chapter.
+
+Map
+
+The ability to map objects to other objects can be an immensely powerful way to solve programming problems. For example, consider a program to examine the randomness of Java’s Random class. Ideally, Random would produce a perfect distribution of numbers, but to test this you need to generate many random numbers and count the ones that fall in the various ranges. A Map easily solves the problem; in this case, the key is the number produced by Random, and the value is the number of times that number appears.
+
+Queue
+
+A queue is typically a “first-in, first-out" (FIFO) container. That is, you put things in at one end and pull them out at the other, and the order in which you put them in will be the same order in which they come out. Queues are commonly used as a way to reliably transfer objects from one area of a program to another. Queues are especially important in concurrent programming, as you will see in the Concurrency chapter, because they safely transfer objects from one task to another.
+
+offer( ) is one of the Queue-specific methods; it inserts an element at the tail of the queue if it can, or returns false. Both peek( ) and element( ) return the head of the queue without removing it, but peek( ) returns null if the queue is empty and element( ) throws NoSuchElementException. Both poll( ) and remove( ) remove and return the head of the queue, but poll( ) returns null if the queue is empty, while remove( ) throws NoSuchElementException.
+
+PriorityQueue
+
 
 
 
