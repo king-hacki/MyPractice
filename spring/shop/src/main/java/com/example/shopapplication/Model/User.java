@@ -9,11 +9,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table
+@Table(name = "users",
+       uniqueConstraints = {
+       @UniqueConstraint(columnNames = "username"),
+       @UniqueConstraint(columnNames = "password")
+})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank(message = "Field 'first_name' must be filled")
+    private String firstName;
+
+    @NotBlank(message = "Field 'last_name' must be filled")
+    private String lastName;
 
     @NotBlank(message = "Field 'username' must be filled")
     @Size(max = 20)
@@ -29,13 +39,17 @@ public class User {
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable
+    @JoinTable(name = "user_roles",
+               joinColumns = @JoinColumn(name = "user_id"),
+               inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     public User(){}
 
-    public User(String username,String email,String password) {
+    public User(String username,String firstName, String lastName,String email,String password) {
         this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
@@ -78,5 +92,21 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

@@ -4,7 +4,7 @@ package com.example.shopapplication.Model;
 import javax.persistence.*;
 
 @Entity
-@Table
+@Table(name = "roles")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

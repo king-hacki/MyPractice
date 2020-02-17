@@ -1,28 +1,31 @@
 package item_5_dependency_injection;
 
-import java.util.Objects;
-
 public class DependencyInjection {
 
 	public static void main(String[] args) {
 		
-		TestInjection test = new TestInjection(5, "Chikens");
-		System.out.println(test);
+		System.out.println(new TestInjection(new Injeciton(5)).i.x);
+		
 	}
-
 }
 
 class TestInjection {
 	
-	int x;
-	String text;
+	Injeciton i;
 	
-	TestInjection(int x, String text) {
-		this.text = Objects.requireNonNull(text);
-		this.x = x;
+	TestInjection (Injeciton i) {
+		System.out.println("Hello from TestInjection");
+		this.i = i;
 	}
 	
-	public String toString() {
-		return "[ + ] " + text + " is " + x;
+}
+
+class Injeciton {
+
+	int x;
+	
+	public Injeciton (int x) {		
+		System.out.println("Hello from Injection");
+		this.x = x;
 	}
 }

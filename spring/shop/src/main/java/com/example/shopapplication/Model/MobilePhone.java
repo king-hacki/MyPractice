@@ -31,8 +31,10 @@ public class MobilePhone {
 
     @NotBlank(message = "field must be filled")
     private String graduationYear;
-        
+
     private Double price;
+
+    private String description;
 
     public Long getId() {
         return id;
