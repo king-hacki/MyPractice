@@ -16,8 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("*")
@@ -57,6 +55,10 @@ public class UserController {
     @GetMapping("/allUsers")
     @PreAuthorize("hasRole('ADMIN')")
     public Iterable<User> getAllUsers(){
+        System.out.println("hello from function ADMIN");
+        for(User user : userService.findAllUsers()){
+            System.out.println(user.toString());
+        }
         return userService.findAllUsers();
     }
 }

@@ -1,11 +1,13 @@
 package com.example.shopapplication.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,14 +33,11 @@ public class MobilePhone {
 
     @NotBlank(message = "field must be filled")
     private String graduationYear;
-
+        
     private Double price;
 
-    private String description;
-
-    public Long getId() {
-        return id;
-    }
+    @OneToOne(cascade = CascadeType.ALL)
+    private Chat chat;
 
     public void setId(Long id) {
         this.id = id;

@@ -1,14 +1,11 @@
 package com.example.shopapplication.Services;
 
 import com.example.shopapplication.Exceptions.MobilePhoneIdException;
+import com.example.shopapplication.Model.Chat;
 import com.example.shopapplication.Model.MobilePhone;
 import com.example.shopapplication.Repositories.MobilePhoneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MobilePhoneService {
@@ -18,6 +15,12 @@ public class MobilePhoneService {
 
     public MobilePhone saveOrUpdateMobile(MobilePhone mobilePhone){
         try {
+
+            // Create Chat when creating Phone if it is't
+            if (mobilePhone.getChat() == null)
+                mobilePhone.setChat(new Chat());
+
+
             return mobilePhoneRepository.save(mobilePhone);
         }catch (Exception e){
             throw new MobilePhoneIdException("MobilePhone ID '" + mobilePhone.getMobileIdentifier() + "' already exists");

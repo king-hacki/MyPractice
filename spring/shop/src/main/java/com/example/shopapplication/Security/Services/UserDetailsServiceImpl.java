@@ -29,7 +29,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throwable.printStackTrace();
         }
 
-
         return UserDetailsImpl.build(user);
     }
 }

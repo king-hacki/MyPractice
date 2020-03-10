@@ -1,13 +1,22 @@
 package com.example.shopapplication.Model;
 
 
+
+import lombok.Getter;
+import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users",
        uniqueConstraints = {
@@ -16,6 +25,7 @@ import java.util.Set;
 })
 public class User {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -37,6 +47,9 @@ public class User {
     @NotBlank(message = "Field 'password' must be filled")
     @Size(min = 8,max = 120)
     private String password;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private ShoppingCart shoppingCart;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
@@ -108,5 +121,24 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "username" + this.getUsername() + "\n" +
+                "firstName" + this.getFirstName() + "\n" +
+                "lastName" + this.getLastName() + "\n" +
+                "email" + this.getEmail() + "\n" +
+                "ShoppingCart" + this.getShoppingCart().getMobilePhoneList() + "\n" +
+                "}";
     }
 }
