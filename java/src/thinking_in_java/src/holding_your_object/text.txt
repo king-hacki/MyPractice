@@ -66,7 +66,8 @@ class Slush extends Snow {}
 		//List<Snow> snow2 = Arrays.asList(new Light(), new Heavy());
 
 		// Collections.addAll() doesn’t get confused: 
-		List<Snow> snow3 = new ArrayList<Snow>(); Collections.addAll(snow3, new Light(), new Heavy());
+		List<Snow> snow3 = new ArrayList<Snow>(); 
+		Collections.addAll(snow3, new Light(), new Heavy());
 
 	// Give a hint using an
 	// explicit type argument specification: 
@@ -128,7 +129,6 @@ A queue is typically a “first-in, first-out" (FIFO) container. That is, you pu
 
 offer( ) is one of the Queue-specific methods; it inserts an element at the tail of the queue if it can, or returns false. Both peek( ) and element( ) return the head of the queue without removing it, but peek( ) returns null if the queue is empty and element( ) throws NoSuchElementException. Both poll( ) and remove( ) remove and return the head of the queue, but poll( ) returns null if the queue is empty, while remove( ) throws NoSuchElementException.
 
-PriorityQueue
 
 
 
