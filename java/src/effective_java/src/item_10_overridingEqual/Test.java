@@ -99,6 +99,7 @@ class SonTest extends DadTest {
 	}
 	
 	SonTest(int y) {
+		System.out.println(x);
 		this.y = y;
 	}
 	

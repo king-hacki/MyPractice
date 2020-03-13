@@ -22,7 +22,7 @@ public class Reflection {
 		
 		Field privateField = c.getDeclaredField("i");
 		privateField.setAccessible(true);
-		System.out.println(privateField.get(dad));		//	can't do this
+		System.out.println(privateField.get(dad));		//	can do this
 		
 		Method privateMethod = c.getDeclaredMethod("getByReflection");
 		privateMethod.setAccessible(true);

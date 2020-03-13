@@ -26,15 +26,15 @@ public class TransitivityViolation {
 		
 		System.out.println("------------");		
 		
-		ColorPointWithoutViolation cpr1 = new ColorPointWithoutViolation(1, 2, new Color("Red"));
-		ColorPointWithoutViolation cpr2 = new ColorPointWithoutViolation(1, 2, new Color("Blue"));
+		ColorPointWithoutViolation cpr1 = new ColorPointWithoutViolation(1, 2, "Red");
+		ColorPointWithoutViolation cpr2 = new ColorPointWithoutViolation(1, 2, "Blue");
+		ColorPointWithoutViolation cpr3 = new ColorPointWithoutViolation(1, 2, "Red");
 		
 		//	Right
-		System.out.println(cpr1.equals(p));			//	false
-		System.out.println(p.equals(cpr1));			//	false
-		System.out.println(p.equals(cpr2));			//	false
-		System.out.println(cpr2.equals(p));			//	false
-		System.out.println(cpr1.equals(cpr2));		// 	false 
+		System.out.println(cpr1.point.equals(p));	//	true
+		System.out.println(cpr2.point.equals(p));	//	true
+		System.out.println(cpr1.equals(cpr2));		//	false
+		System.out.println(cpr1.equals(cpr3));		//	true
 	}
 }
 
@@ -106,14 +106,14 @@ class ColorPointTransitivityViolationCause extends Point {
 
 }
 
-class ColorPointWithoutViolation{
+class ColorPointWithoutViolation {
 	
 	Color color;
 	Point point;
 	
-	public ColorPointWithoutViolation(int x, int y, Color c) {		
+	public ColorPointWithoutViolation(int x, int y, String c) {		
 		point = new Point (x, y);
-		this.color = c;
+		color = new Color(c);
 	}
 	
 	@Override
@@ -134,6 +134,17 @@ class Color {
 	
 	Color(String color){
 		this.color = color;
+	}
+	
+	@Override 
+	public boolean equals(Object o) {
+		
+		if (!(o instanceof Color))
+			return false;
+		
+		Color c = (Color) o;
+		
+		return this.color == c.color;
 	}
 	
 }
