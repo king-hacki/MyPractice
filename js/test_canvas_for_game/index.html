@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Test Canvas</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body style="margin: 0;">
+        <canvas id="canvas" style="display: block;">Test</canvas>
+        <script>
+            
+            let canvas = document.getElementById('canvas')
+            let context = canvas.getContext('2d')
+        
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight    
+
+            //  Code
+            // var x = 50
+            
+            context.fillStyle = 'magenta'
+            // context.fillRect(x, 50, 300, 200)
+
+            // Set graduent variable
+            let grad = context.createLinearGradient(0, 0, 750, 0);
+            
+            //  gradient changes
+            grad.addColorStop(0, 'magenta');
+            grad.addColorStop(0.5, 'blue');
+            grad.addColorStop(1, 'red')
+            
+
+            context.fillStyle=grad;
+            context.textAlign='center';
+            
+            //  text
+            context.font='bold 40px sans-serif';
+            context.fillText('Test ', canvas.width / 2, canvas.height / 2);
+            
+
+
+            //  Props for triangle
+            // context.lineWidth=10;
+            // context.strokeStyle='red';
+            // context.scale(3, 3);
+
+            //  Draw Triangle
+            // context.beginPath();
+            // context.moveTo(100, 100);
+            // context.lineTo(75, 150);
+            // context.lineTo(125, 150);
+            // context.closePath();
+            // context.stroke();
+
+            //  Draw Circle
+            // context.arc(canv.width / 2, canv.height / 2, 100, 0, Math.PI * 2, true)
+            // context.fill()
+
+            //  Draw Stoke rec
+            // context.strokeStyle = 'red'
+            // context.lineWidth = 10
+            // context.strokeRect(x, 50, 300, 200)
+
+            //  Animation rect
+            //  setInterval(() => {
+            //      ctx.fillStyle='white'
+            //      ctx.fillRect(0, 0, canv.width, canv.height)
+
+            //      ctx.fillStyle = 'magenta'
+            //      ctx.fillRect(x++, 50, 300, 200)
+            //  }, 10)
+        </script>
+    </body>
+</html>
