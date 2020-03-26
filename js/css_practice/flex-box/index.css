@@ -1,0 +1,48 @@
+body {
+    background-color: honeydew;
+}
+
+.homework {
+    color: brown;
+}
+
+ul {
+    display: flex;  
+    border: 3px dashed green;
+    margin: 5%;
+}
+
+.table_column {
+    flex-direction: column;
+}
+
+.table_row {
+    flex-direction: row;
+}
+
+.table_reverse_column {
+    flex-direction: column-reverse;
+}
+
+.table_reverse_row {
+    flex-direction: row-reverse;
+}
+
+.smth {
+    display: flex;
+    justify-content: space-around;
+}
+
+li {
+    flex-grow: 1;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    margin-right: 8px;
+    list-style-type: none;
+    font-size: 25px;
+}
+
+li a {
+    text-decoration-color: darkred;
+    color: red;
+}

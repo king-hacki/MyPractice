@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+    border: 1px dashed white;
+    background-color: goldenrod;
+}
+
+.container li {
+    flex-grow: 1;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    margin-right: 8px;
+    background-color: black;
+    list-style-type: none;
+    font-size: 25px;
+}
+
+.container li a {
+    color: whitesmoke;
+}
