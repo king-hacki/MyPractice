@@ -1,0 +1,52 @@
+#container_task1 {
+    width: 100%;
+    text-align: center;
+}
+
+#center {
+    display: inline-block;
+    margin: 0 auto;
+    width: 100px;
+    height: 200px;
+}
+
+#left {
+    float: left;
+    width: 250px;
+}
+
+#right {
+    float: right;
+    width: 250px;
+}
+
+#center_img {
+    text-align: center;
+}
+
+.leftObtainImg {
+    float: left;
+    margin: 10px 10px 10px 0
+}
+
+.rightObtainImg {
+    float: right;
+    margin: 10px 10px 10px 0
+}
+
+#images {
+    width: 100%;
+}
+
+#top {
+    float: left;
+}
+
+#middle{
+    text-align: center;
+    margin-top: 200px;
+}
+
+#bottom {
+    margin-left: 500px;
+}

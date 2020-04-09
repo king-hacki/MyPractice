@@ -1,0 +1,38 @@
+.leftObtainImg {
+    float: left;
+    margin: 10px 10px 10px 0
+}
+
+.rightObtainImg {
+    float: right;
+    margin: 10px 10px 10px 0
+}
+
+.img-container {
+    text-align: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.img-container img {
+    width: 80%;
+    display: inline-block;
+    transition: .25s;
+}
+
+.img-container ul li {
+    list-style-type: none;
+}
+
+.img-container li {
+    display: inline-block;
+    width: 32%;
+    padding: 10px;
+}
+
+.inline-img {
+    width: 250px;
+    display: inline-block;
+    border-radius: 15px;
+    text-align: center;
+}
