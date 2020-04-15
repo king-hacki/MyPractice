@@ -4,7 +4,7 @@ const prom = new Promise((res, rej) => {
     rej('error');
     res('2');
   })
-    .then((res) => {
+    .then(res => {
         console.log('then: ', res);
         throw new Error('test error')
     })
