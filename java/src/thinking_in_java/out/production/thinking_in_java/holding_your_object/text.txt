@@ -1,0 +1,136 @@
+
+
+Holding Your Objects
+
+In general, your programs will always be creating new objects based on some criteria that will be known only at run time. Before then, you won’t know the quantity or even the exact type of the objects you need. To solve the general programming problem, you need to create any number of objects, anytime, anywhere.
+
+Most languages provide some way to solve this essential problem. Java has several ways to hold objects (or rather, references to objects). The compiler-supported type is the array, which has been discussed before. An array is the most efficient way to hold a group of objects, and you’re pointed towards this choice if you want to hold a group of primitives. But an array has a fixed size, and in the more general case, you won’t know at the time you’re writing the program how many objects you’re going to need, or whether you need a more sophisticated way to store your objects—so the fixed-sized constraint of an array is too limiting.
+
+
+Generics and type-safe containers
+
+
+One of the problems of using pre-Java SE5 containers was that the compiler allowed you to insert an incorrect type into a container. For example, consider a container of Apple objects, using the basic workhorse container, ArrayList. 
+
+You are not limited to putting the exact type of object into a container when you specify that type as a generic parameter. Upcasting works the same with generics as it does with other types
+
+
+Basic concepts
+
+
+The Java container library takes the idea of "holding your objects" and divides it into two distinct concepts, expressed as the basic interfaces of the library:
+
+1. Collection : a sequence of individual elements with one or more rules applied to them.                A List must hold the elements in the way that they were inserted, a Set cannot have duplicate elements, and a Queue produces the elements in the order determined by a queuing discipline (usually the same order in which they are inserted).
+
+2. Map : a group of key-value object pairs, allowing you to look up a value using a key. An ArrayList allows you to look up an object using a number, so in a sense it associates numbers to objects. A map allows you to look up an object using another object. It’s also called an associative array, because it associates objects with other objects, or a dictionary, because you look up a value object using a key object just like you look up a definition using a word. Maps are powerful programming tools.
+
+Although it’s not always possible, ideally you’ll write most of your code to talk to these interfaces, and the only place where you’ll specify the precise type you’re using is at the point of creation. So you can create a List like this:
+
+List<Apple> apples = new ArrayList<Apple>();
+
+Notice that the ArrayList has been upcast to a List, in contrast to the way it was handled in the previous examples. The intent of using the interface is that if you decide you want to change your implementation, all you need to do is change it at the point of creation, like this:
+
+List<Apple> apples = new LinkedList<Apple>();
+
+Thus, you’ll typically make an object of a concrete class, upcast it to the corresponding interface, and then use the interface throughout the rest of your code.
+
+This approach won’t always work, because some classes have additional functionality. For example, LinkedList has additional methods that are not in the List interface, and a TreeMap has methods that are not in the Map interface. If you need to use those methods, you won’t be able to upcast to the more general interface.
+
+
+Adding groups of elements
+
+
+There are utility methods in both the Arrays and Collections classes in java.util that add groups of elements to a Collection. Arrays.asList( ) takes either an array or a comma- separated list of elements (using varargs) and turns it into a List object. Collections.addAll( ) takes a Collection object and either an array or a comma-separated list and adds the elements to the Collection.
+
+The constructor for a Collection can accept another Collection which it uses for initializing itself, so you can use Arrays.asList( ) to produce input for the constructor. However, Collections.addAll( ) runs much faster, and it’s just as easy to construct the Collection with no elements and then call Collections.addAll( ), so this is the preferred approach.
+
+The Collection.addAll( ) member method can only take an argument of another Collection object, so it is not as flexible as Arrays.asList( ) or Collections.addAll( ), which use variable argument lists.
+
+It’s also possible to use the output of Arrays.asList( ) directly, as a List, but the underlying representation in this case is the array, which cannot be resized. If you try to add( ) or delete( ) elements in such a list, that would attempt to change the size of an array, so you’ll get an "Unsupported Operation" error at run time.
+
+A limitation of Arrays.asList( ) is that it takes a best guess about the resulting type of the List, and doesn’t pay attention to what you’re assigning it to. Sometimes this can cause a problem:
+
+class Snow {}
+class Powder extends Snow {}
+class Light extends Powder {}
+class Heavy extends Powder {}
+class Crusty extends Snow {}
+class Slush extends Snow {}
+	public class AsListInference {
+		public static void main(String[] args) {
+		List<Snow> snow1 = Arrays.asList(new Crusty(), new Slush(), new Powder());
+		// Compiler says:
+		// found : java.util.List<Powder>
+		// required: java.util.List<Snow>
+		//Won’t compile:
+		//List<Snow> snow2 = Arrays.asList(new Light(), new Heavy());
+
+		// Collections.addAll() doesn’t get confused: 
+		List<Snow> snow3 = new ArrayList<Snow>(); 
+		Collections.addAll(snow3, new Light(), new Heavy());
+
+	// Give a hint using an
+	// explicit type argument specification: 
+	List<Snow> snow4 = Arrays.<Snow>asList(new Light(), new Heavy());
+
+
+When trying to create snow2, Arrays.asList( ) only has types of Powder, so it creates a List<Powder> rather than a List<Snow>, whereas Collections.addAll( ) works fine because it knows from the first argument what the target type is.
+
+As you can see from the creation of snow4, it’s possible to insert a "hint" in the middle of Arrays.asList( ), to tell the compiler what the actual target type should be for the resulting List type produced by Arrays.asList( ). This is called an explicit type argument specification.
+
+Maps are more complex, as you’ll see, and the Java standard library does not provide any way to automatically initialize them, except from the contents of another Map.
+
+
+Printing containers
+
+
+You must use Arrays.toString( ) to produce a printable representation of an array, but the containers print nicely without any help.
+
+
+Iterator
+
+In any container, you must have a way to insert elements and fetch them out again. After all, that’s the primary job of a container—to hold things. In a List, add( ) is one way to insert elements, and get( ) is one way to fetch elements.
+
+If you want to start thinking at a higher level, there’s a drawback: You need to program to the exact type of the container in order to use it. This might not seem bad at first, but what if you write code for a List, and later on you discover that it would be convenient to apply that same code to a Set? Or suppose you’d like to write, from the beginning, a piece of general- purpose code that doesn’t know or care what type of container it’s working with, so that it can be used on different types of containers without rewriting that code?
+
+The concept of an Iterator (another design pattern) can be used to achieve this abstraction. An iterator is an object whose job is to move through a sequence and select each object in that sequence without the client programmer knowing or caring about the underlying structure of that sequence. In addition, an iterator is usually what’s called a lightweight object: one that’s cheap to create. For that reason, you’ll often find seemingly strange constraints for iterators; for example, the Java Iterator can move in only one direction.
+
+ListIterator
+
+The ListIterator is a more powerful subtype of Iterator that is produced only by List classes. While Iterator can only move forward, ListIterator is bidirectional. It can also produce the indexes of the next and previous elements relative to where the iterator is pointing in the list, and it can replace the last element that it visited using the set( ) method. You can produce a ListIterator that points to the beginning of the List by calling listIterator( ), and you can also create a ListIterator that starts out pointing to an index n in the list by calling listIterator(n).
+
+LinkedList
+
+The LinkedList also implements the basic List interface like ArrayList does, but it performs certain operations (insertion and removal in the middle of the List) more efficiently than does ArrayList. Conversely, it is less efficient for random-access operations.
+
+Stack
+
+A stack is sometimes referred to as a "last-in, first-out" (LIFO) container. It’s sometimes called a pushdown stack, because whatever you "push" on the stack last is the first item you can "pop" off of the stack. An often-used analogy is of cafeteria trays in a spring-loaded holder—the last ones that go in are the first ones that come out.
+
+LinkedList has methods that directly implement stack functionality, so you can also just use a LinkedList rather than making a stack class. 
+
+This introduces the simplest possible example of a class definition using generics. The <T> after the class name tells the compiler that this will be a parameterized type, and that the type parameter—the one that will be substituted with a real type when the class is used—is T. Basically, this says, "We’re defining a Stack that holds objects of type T." The Stack is implemented using a LinkedList, and the LinkedList is also told that it is holding type T. Notice that push( ) takes an object of type T, while peek( ) and pop( ) return an object of type T. The peek( ) method provides you with the top element without removing it from the top of the stack, while pop( ) removes and returns the top element.
+
+If you want only stack behavior, inheritance is inappropriate here because it would produce a class with all the rest of the LinkedList methods (you’ll see in the Containers in Depth chapter that this very mistake was made by the Java l.o designers when they created java.util.Stack).
+
+Set
+
+A Set refuses to hold more than one instance of each object value. If you try to add more than one instance of an equivalent object, the Set prevents duplication. The most common use for a Set is to test for membership, so that you can easily ask whether an object is in a Set. Because of this, lookup is typically the most important operation for a Set, so you’ll usually choose a HashSet implementation, which is optimized for rapid lookup.
+
+Set has the same interface as Collection, so there isn’t any extra functionality like there is in the two different types of List. Instead, the Set is exactly a Collection—it just has different behavior. (This is the ideal use of inheritance and polymorphism: to express different behavior.) A Set determines membership based on the "value" of an object, a more complex topic that you will learn about in the Containers in Depth chapter.
+
+Map
+
+The ability to map objects to other objects can be an immensely powerful way to solve programming problems. For example, consider a program to examine the randomness of Java’s Random class. Ideally, Random would produce a perfect distribution of numbers, but to test this you need to generate many random numbers and count the ones that fall in the various ranges. A Map easily solves the problem; in this case, the key is the number produced by Random, and the value is the number of times that number appears.
+
+Queue
+
+A queue is typically a “first-in, first-out" (FIFO) container. That is, you put things in at one end and pull them out at the other, and the order in which you put them in will be the same order in which they come out. Queues are commonly used as a way to reliably transfer objects from one area of a program to another. Queues are especially important in concurrent programming, as you will see in the Concurrency chapter, because they safely transfer objects from one task to another.
+
+offer( ) is one of the Queue-specific methods; it inserts an element at the tail of the queue if it can, or returns false. Both peek( ) and element( ) return the head of the queue without removing it, but peek( ) returns null if the queue is empty and element( ) throws NoSuchElementException. Both poll( ) and remove( ) remove and return the head of the queue, but poll( ) returns null if the queue is empty, while remove( ) throws NoSuchElementException.
+
+
+
+
+
+

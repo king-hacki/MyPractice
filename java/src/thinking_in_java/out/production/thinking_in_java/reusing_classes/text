@@ -1,0 +1,211 @@
+
+
+Reusing Classes
+
+
+One of the most compelling features about Java is code reuse. But to be revolutionary, you’ve got to be able to do a lot more than copy code and change it.
+
+The trick is to use the classes without soiling the existing code. In this chapter you’ll see two ways to accomplish this. The first is quite straightforward: you simply create objects of your existing class inside the new class. This is called composition, because the new class is composed of objects of existing classes. You’re simply reusing the functionality of the code, not its form.
+
+The second approach is more subtle. It creates a new class as a type of an existing class. You literally take the form of the existing class and add code to it without modifying the existing class. This technique is called inheritance, and the compiler does most of the work. Inheritance is one of the cornerstones of object-oriented programming, and has additional implications that will be explored in the Polymorphism chapter.
+
+
+Composition syntax
+
+
+You simply place object references inside new classes. For example, suppose you’d like an object that holds several String objects, a couple of primitives, and an object of another class. For the non- primitive objects, you put references inside your new class, but you define the primitives directly:
+
+
+Відкладена (лінива) ініціалізація (англ. Lazy initialization) — прийом в програмуванні, коли деяка ресурсномістка операція (створення об'єкта, обчислення значення) виконується безпосередньо перед тим, як буде використаний її результат. Таким чином, ініціалізація виконується "на вимогу", а не завчасно. Аналогічна ідея знаходить застосування в самих різних галузях: наприклад, компіляція «на льоту» і логістична концепція «Точно в строк».
+
+public class Fruit {
+ 
+    private static final Map<String,Fruit> types = new HashMap<String, Fruit>();
+    private final String type;
+ 
+    // using a private constructor to force use of the factory method.
+    private Fruit(String type) {
+        this.type = type;
+    }
+ 
+    /**
+    * Lazy Factory method, gets the Fruit instance associated with a
+    * certain type. Instantiates new ones as needed.
+    * @param type Any string that describes a fruit type, e.g. "apple"
+    * @return The Fruit instance associated with that type.
+    */
+    public static synchronized Fruit getFruit(String type) {
+        if(!types.containsKey(type)) {
+            types.put(type, new Fruit(type)); // Lazy initialization
+        }
+        return types.get(type);
+    }
+ 
+}
+
+
+Inheritance syntax
+
+
+The syntax for composition is obvious, but to perform inheritance there’s a distinctly different form. When you inherit, you say “This new class is like that old class.” You state this in code before the opening brace of the class body, using the keyword extends followed by the name of the base class. When you do this, you automatically get all the fields and methods in the base class. Here’s an example:
+
+From the outside, it looks like the new class has the same interface as the base class and maybe some additional methods and fields. But inheritance doesn’t just copy the interface of the base class. When you create an object of the derived class, it contains within it a subobject of the base class. This subobject is the same as if you had created an object of the base class by itself. It’s just that from the outside, the subobject of the base class is wrapped within the derived-class object.
+
+If your class doesn’t have default arguments, or if you want to call a base-class constructor that has an argument, you must explicitly write the calls to the base-class constructor using the super keyword and the appropriate argument list
+
+
+Delegation
+
+
+A third relationship, which is not directly supported by Java, is called delegation. This is midway between inheritance and composition, because you place a member object in the class you’re building (like composition), but at the same time you expose(виставляти) all the methods from the member object in your new class (like inheritance). 
+
+Good Example for me :
+
+public class SpaceShipControls {
+  void up(int velocity) {}
+  void down(int velocity) {}
+  void left(int velocity) {}
+  void right(int velocity) {}
+  void forward(int velocity) {}
+  void back(int velocity) {}
+  void turboBoost() {}
+} ///:~
+One way to build a spaceship is to use inheritance:
+//: reusing/SpaceShip.java
+public class SpaceShip extends SpaceShipControls { private String name;
+public SpaceShip(String name) { this.name = name; } public String toString() { return name; }
+public static void main(String[] args) {
+SpaceShip protector = new SpaceShip("NSEA Protector"); protector.forward(100);
+}
+} ///:~
+
+However, a SpaceShip isn’t really “a type of” SpaceShipControls, even if, for example, you “tell” a SpaceShip to go forward( ). It’s more accurate to say that a SpaceShip contains SpaceShipControls, and at the same time all the methods in SpaceShipControls are exposed in a SpaceShip. Delegation solves the dilemma:
+
+public class SpaceShipDelegation { 
+  private String name;
+  private SpaceShipControls controls = new SpaceShipControls();
+  public SpaceShipDelegation(String name) {
+	this.name = name; 
+  }
+  // Delegated methods:
+  public void back(int velocity) {
+	controls.back(velocity); 
+  }
+  public void down(int velocity) {
+	controls.down(velocity); 
+  }
+  public void forward(int velocity) { 
+	controls.forward(velocity);
+  }
+  public void left(int velocity) {
+	controls.left(velocity); 
+  }
+  public void right(int velocity) { 
+	controls.right(velocity);
+  }
+  public void turboBoost() {
+	controls.turboBoost(); 
+  }
+  public void up(int velocity) { 
+	controls.up(velocity);
+  }
+  public static void main(String[] args) {
+	SpaceShipDelegation protector =  new SpaceShipDelegation("NSEA Protector");
+	protector.forward(100); 
+  }
+} ///:~
+
+As I see delegates methods are methods which means that in their body that have call to method in other class
+
+
+Name hiding
+
+
+
+If a Java base class has a method name that’s overloaded several times, redefining that method name in the derived class will not hide any of the base-class versions (unlike C++). Thus overloading works regardless of whether the method was defined at this level or in a base class:
+
+
+Upcasting
+
+
+//: reusing/Wind.java
+// Inheritance & upcasting.
+    class Instrument {
+      public void play() {}
+      static void tune(Instrument i) {
+// ...
+i.play(); }
+}
+    // Wind objects are instruments
+    // because they have the same interface:
+    public class Wind extends Instrument {
+public static void main(String[] args) { Wind flute = new Wind();
+Instrument.tune(flute); // Upcasting }
+} ///:~
+What’s interesting in this example is the tune( ) method, which accepts an Instrument reference. However, in Wind.main( ) the tune( ) method is called by giving it a Wind reference. Given that Java is particular about type checking, it seems strange that a method that accepts one type will readily accept another type, until you realize that a Wind object is also an Instrument object, and there’s no method that tune( ) could call for an Instrument that isn’t also in Wind. Inside tune( ), the code works for Instrument and anything derived from Instrument, and the act of converting a Wind reference into an Instrument reference is called upcasting.
+
+
+Composition vs. inheritance revisited
+
+
+In object-oriented programming, the most likely way that you’ll create and use code is by simply packaging data and methods together into a class, and using objects of that class. You’ll also use existing classes to build new classes with composition. Less frequently, you’ll use inheritance. So although inheritance gets a lot of emphasis while learning OOP, it doesn’t mean that you should use it everywhere you possibly can. On the contrary, you should use it sparingly, only when it’s clear that inheritance is useful. One of the clearest ways to determine whether you should use composition or inheritance is to ask whether you’ll ever need to upcast from your new class to the base class. If you must upcast, then inheritance is necessary, but if you don’t need to upcast, then you should look closely at whether you need inheritance. The Polymorphism chapter provides one of the most compelling reasons for upcasting, but if you remember to ask “Do I need to upcast?” you’ll have a good tool for deciding between composition and inheritance.
+
+
+The final keyword
+
+Java’s final keyword has slightly different meanings depending on the context, but in general it says “This cannot be changed.” You might want to prevent changes for two reasons: design or efficiency. Because these two reasons are quite different, it’s possible to misuse the final keyword.
+
+
+final data
+
+
+A field that is both static and final has only one piece of storage that cannot be changed.
+
+When final is used with object references rather than primitives, the meaning can be confusing. With a primitive, final makes the value a constant, but with an object reference, final makes the reference a constant. Once the reference is initialized to an object, it can never be changed to point to another object. However, the object itself can be modified; Java does not provide a way to make any arbitrary object a constant. (You can, however, write your class so that objects have the effect of being constant.) This restriction includes arrays, which are also objects.
+
+
+Blank finals
+
+
+Java allows the creation of blank finals, which are fields that are declared as final but are not given an initialization value. In all cases, the blank final must be initialized before it is used, and the compiler ensures this. However, blank finals provide much more flexibility in the use of the final keyword since, for example, a final field inside a class can now be different for each object, and yet it retains its immutable quality.
+
+final arguments
+
+Java allows you to make arguments final by declaring them as such in the argument list. This means that inside the method you cannot change what the argument reference points to:
+
+final methods
+
+There are two reasons for final methods. The first is to put a “lock” on the method to prevent any inheriting class from changing its meaning. This is done for design reasons when you want to make sure that a method’s behavior is retained during inheritance and cannot be overridden.
+
+The second reason for final methods is efficiency. In earlier implementations of Java, if you made a method final, you allowed the compiler to turn any calls to that method into inline calls. When the compiler saw a final method call, it could (at its discretion) skip the normal approach of inserting code to perform the method call mechanism (push arguments on the stack, hop over to the method code and execute it, hop back and clean off the stack arguments, and deal with the return value) and instead replace the method call with a copy of the actual code in the method body. This eliminated the overhead of the method call. Of course, if a method is big, then your code begins to bloat, and you probably wouldn’t see any performance gains from inlining, since any improvements will be dwarfed by the amount of time spent inside the method.
+
+In more recent version of Java, the virtual machine (in particular, the hotspot technologies) can detect these situations and optimize away the extra indirection, so its no longer necessary-in fact, it is now generally discouraged-to use final to try to help the optimizer. With Java SE5/6, you should let the compiler and JVM handle efficiency issues and make a method final only if you want to explicitly prevent overriding.
+
+
+final and private
+
+
+Any private methods in a class are implicitly final. Because you can’t access a private method, you can’t override it. You can add the final specifier to a private method, but it doesn’t give that method any extra meaning.
+
+“Overriding” can only occur if something is part of the base-class interface. That is, you must be able to upcast an object to its base type and call the same method (the point of this will become clear in the next chapter). If a method is private, it isn’t part of the base-class interface. It is just some code that’s hidden away inside the class, and it just happens to have that name, but if you create a public, protected, or package-access method with the same name in the derived class, there’s no connection to the method that might happen to have that name in the base class. You haven’t overridden the method; you’ve just created a new method. Since a private method is unreachable and effectively invisible, it doesn’t factor into anything except for the code organization of the class for which it was defined.
+
+
+final classes
+
+
+When you say that an entire class is final (by preceding its definition with the final keyword), you state that you don’t want to inherit from this class or allow anyone else to do so. In other words, for some reason the design of your class is such that there is never a need to make any changes, or for safety or security reasons you don’t want subclassing.
+
+Note that the fields of a final class can be final or not, as you choose. The same rules apply to final for fields regardless of whether the class is defined as final. However, because it prevents inheritance, all methods in a final class are implicitly final, since there’s no way to override them. You can add the final specifier to a method in a final class, but it doesn’t add any meaning.
+
+
+Summary
+
+
+Both inheritance and composition allow you to create a new type from existing types. Composition reuses existing types as part of the underlying implementation of the new type, and inheritance reuses the interface.
+With Inheritance, the derived class has the base-class interface, so it can be upcast to the base, which is critical for polymorphism, as you’ll see in the next chapter.
+
+Despite the strong emphasis on inheritance in object-oriented programming, when you start a design you should generally prefer composition (or possibly delegation) during the first cut and use inheritance only when it is clearly necessary. Composition tends to be more flexible. In addition, by using the added artifice of inheritance with your member type, you can change the exact type, and thus the behavior, of those member objects at run time. Therefore, you can change the behavior of the composed object at run time.
+
+When designing a system, your goal is to find or create a set of classes in which each class has a specific use and is neither too big (encompassing so much functionality that it’s unwieldy to reuse) nor annoyingly small (you can’t use it by itself or without adding functionality). If your designs become too complex, it’s often helpful to add more objects by breaking down existing ones into smaller parts.
+
+When you set out to design a system, it’s important to realize that program development is an incremental process, just like human learning. It relies on experimentation; you can do as much analysis as you want, but you still won’t know all the answers when you set out on a project. You’ll have much more success-and more immediate feedback-if you start out to “grow” your project as an organic, evolutionary creature, rather than constructing it all at once like a glass-box skyscraper. Inheritance and composition are two of the most fundamental tools in object-oriented programming that allow you to perform such experiments.

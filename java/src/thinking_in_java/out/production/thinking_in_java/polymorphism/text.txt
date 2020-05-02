@@ -1,0 +1,157 @@
+
+
+Method-call binding
+
+
+Connecting a method call to a method body is called binding. When binding is performed before the program is run (by the compiler and linker, if there is one), it’s called early binding. You might not have heard the term before because it has never been an option with procedural languages. C compilers have only one kind of method call, and that’s early binding.
+
+The confusing part of the preceding program revolves around early binding, because the compiler cannot know the correct method to call when it has only an Instrument reference.
+
+The solution is called late binding, which means that the binding occurs at run time, based on the type of object. Late binding is also called dynamic binding or runtime binding. When a language implements late binding, there must be some mechanism to determine the type of the object at run time and to call the appropriate method. That is, the compiler still doesn’t know the object type, but the method-call mechanism finds out and calls the correct method body. The late-binding mechanism varies from language to language, but you can imagine that some sort of type information must be installed in the objects.
+
+All method binding in Java uses late binding unless the method is static or final (private methods are implicitly final). This means that ordinarily you don’t need to make any decisions about whether late binding will occur—it happens automatically.
+
+Why would you declare a method final? As noted in the last chapter, it prevents anyone from overriding that method. Perhaps more important, it effectively “turns off” dynamic binding, or rather it tells the compiler that dynamic binding isn’t necessary. This allows the compiler to generate slightly more efficient code for final method calls. However, in most cases it won’t make any overall performance difference in your program, so it’s best to only use final as a design decision, and not as an attempt to improve performance.
+
+Pitfall: “overriding” private methods
+
+The result of this is that only non-private methods may be overridden, but you should watch out for the appearance of overriding private methods, which generates no compiler warnings, but doesn’t do what you might expect. To be clear, you should use a different name from a private base-class method in your derived class.
+
+
+
+Pitfall: “overriding” private methods
+
+If a method is static, it doesn’t behave polymorphically
+
+
+
+Behavior of polymorphic methods inside constructors
+
+
+The hierarchy of constructor calls brings up an interesting dilemma. What happens if you’re inside a constructor and you call a dynamically-bound method of the object being constructed?
+Inside an ordinary method, the dynamically-bound call is resolved at run time, because the object cannot know whether it belongs to the class that the method is in or some class derived from it.
+If you call a dynamically-bound method inside a constructor, the overridden definition for that method is used. However, the effect of this call can be rather unexpected because the overridden method will be called before the object is fully constructed. This can conceal some difficult-to-find bugs.
+Conceptually, the constructor’s job is to bring the object into existence (which is hardly an ordinary feat). Inside any constructor, the entire object might be only partially formed—you can only know that the base-class objects have been initialized. If the constructor is only one step in building an object of a class that’s been derived from that constructor’s class, the derived parts have not yet been initialized at the time that the current constructor is being called. A dynamically bound method call, however, reaches “outward” into the inheritance hierarchy. It calls a method in a derived class. If you do this inside a constructor, you call a method that might manipulate members that haven’t been initialized yet—a sure recipe for disaster.
+Example :
+
+class Glyph {
+	void draw() { print("Glyph.draw()"); } 
+	Glyph() {
+		print("Glyph() before draw()"); draw();
+		print("Glyph() after draw()");
+	} 
+}
+
+class RoundGlyph extends Glyph { 
+	private int radius = 1; 
+	RoundGlyph(int r) {
+		radius = r;
+		print("RoundGlyph.RoundGlyph(), radius = " + radius); 
+	}
+	void draw() {
+		print("RoundGlyph.draw(), radius = " + radius); 
+	}
+}
+public class PolyConstructors {
+	public static void main(String[] args) {
+		new RoundGlyph(5);
+      	}
+}
+
+/* Output:
+Glyph() before draw() 
+RoundGlyph.draw(), radius = 0 
+Glyph() after draw() 
+RoundGlyph.RoundGlyph(), radius = 5
+
+The order of initialization described in the earlier section isn’t quite complete, and that’s the key to solving the mystery. The actual process of initialization is:
+
+1. radius is allocated and equal 0
+2. Call of base-constructor
+3. In base constructor overriden method draw() has called
+4. That's why printed radius = 0
+5. Then default initialization  continues.
+
+As a result, a good guideline for constructors is, “Do as little as possible to set the object into a good state, and if you can possibly avoid it, don’t call any other methods in this class.” The only safe methods to call inside a constructor are those that are final in the base class. (This also applies to private methods, which are automatically final.) These cannot be overridden and thus cannot produce this kind of surprise. You may not always be able to follow this guideline, but it’s something to strive towards
+
+
+Covariant return types
+
+
+Java SE5 adds covariant return types, which means that an overridden method in a derived class can return a type derived from the type returned by the base-class method:
+
+class Grain {
+	public String toString() { return "Grain"; } }
+
+class Wheat extends Grain {
+	public String toString() { return "Wheat"; } }
+
+class Mill {
+	Grain process() { return new Grain(); } }
+
+class WheatMill extends Mill {
+	Wheat process() { return new Wheat(); } }
+
+public class CovariantReturn {
+        public static void main(String[] args) {
+		Mill m = new Mill(); 
+		Grain g = m.process(); 
+		System.out.println(g); 
+		m = new WheatMill(); 
+		g = m.process(); 
+		System.out.println(g);
+	}
+}
+/* Output: 
+Grain
+Wheat
+
+
+The key difference between Java SE5 and earlier versions of java is that the earlier versions would force the overridden version of process( ) to return Grain, rather than Wheat, even though Wheat is derived from Grain and thus is still a legitimate return type. Covariant return types allow the more specific Wheat return type.
+
+
+Designing with inheritance
+
+
+A general guideline is “Use inheritance to express differences in behavior, and fields to express variations in state.”
+
+
+Downcasting and runtime type information
+
+
+
+Since you lose the specific type information via an upcast (moving up the inheritance hierarchy), it makes sense that to retrieve the type information—that is, to move back down the inheritance hierarchy—you use a downcast. However, you know an upcast is always safe because the base class cannot have a bigger interface than the derived class. Therefore, every message you send through the base class interface is guaranteed to be accepted. But with a downcast, you don’t really know that a shape (for example) is actually a circle. It could instead be a triangle or square or some other type.
+To solve this problem, there must be some way to guarantee that a downcast is correct, so that you won’t accidentally cast to the wrong type and then send a message that the object can’t accept. This would be quite unsafe.
+In some languages (like C++) you must perform a special operation in order to get a type-safe downcast, but in Java, every cast is checked! So even though it looks like you’re just performing an ordinary parenthesized cast, at run time this cast is checked to ensure that it is in fact the type you think it is. If it isn’t, you get a ClassCastException. This act of checkingtypes at run time is called runtime type identification (RTTI). The following example demonstrates the behavior of RTTI:
+
+class Useful {
+  public void f() {}
+  public void g() {}
+}
+class MoreUseful extends Useful {
+  public void f() {}
+  public void g() {}
+  public void u() {}
+  public void v() {}
+  public void w() {}
+}
+public class RTTI {
+  public static void main(String[] args) {
+Useful[] x = { new Useful(), new MoreUseful()
+};
+x[0].f();
+x[1].g();
+// Compile time: method not found in Useful: //! x[1].u();
+((MoreUseful)x[1]).u(); // Downcast/RTTI 
+((MoreUseful)x[0]).u(); // Exception thrown
+}
+}
+
+If you want to access the extended interface of a MoreUseful object, you can try to downcast. If it’s the correct type, it will be successful. Otherwise, you’ll get a ClassCastException. You don’t need to write any special code for this exception, since it indicates a programmer error that could happen anywhere in a program. The {ThrowsException} comment tag tells this book’s build system to expect this program to throw an exception when it executes.
+There’s more to RTTI than a simple cast. For example, there’s a way to see what type you’re dealing with before you try to downcast it. All of the Type Information chapter is devoted to the study of different aspects of Java run-time type identification.
+
+Summary
+
+Polymorphism means “different forms.” In object-oriented programming, you have the same interface from the base class, and different forms using that interface: the different versions of the dynamically bound methods.
+You’ve seen in this chapter that it’s impossible to understand, or even create, an example of polymorphism without using data abstraction and inheritance. Polymorphism is a feature that cannot be viewed in isolation (like a switch statement can, for example), but instead works only in concert, as part of the larger picture of class relationships.
+To use polymorphism—and thus object-oriented techniques—effectively in your programs, you must expand your view of programming to include not just members and messages of an individual class, but also the commonality among classes and their relationships with each other. Although this requires significant effort, it’s a worthy struggle. The results are faster program development, better code organization, extensible programs, and easier code maintenance.

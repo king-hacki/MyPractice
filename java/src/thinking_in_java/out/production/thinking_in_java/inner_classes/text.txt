@@ -1,0 +1,163 @@
+
+
+Inner Classes
+
+
+
+It’s possible to place a class definition within another class definition. This is called an inner class
+
+
+The inner class is a valuable feature because it allows you to group classes that logically belong together and to control the visibility of one within the other. However, it’s important to understand that inner classes are distinctly different from composition.
+
+At first, inner classes look like a simple code-hiding mechanism: You place classes inside other classes. You’ll learn, however, that the inner class does more than that—it knows about and can communicate with the surrounding class—and the kind of code you can write with inner classes is more elegant and clear, although there’s certainly no guarantee of this.
+
+Initially, inner classes may seem odd, and it will take some time to become comfortable using them in your designs. The need for inner classes isn’t always obvious, but after the basic syntax and semantics of inner classes have been described, the section "Why inner classes?" should begin to make clear the benefits of inner classes.
+
+After that section, the remainder of the chapter contains more detailed explorations of the syntax of inner classes. These features are provided for language completeness, but you might not need to use them, at least not at first. So the initial parts of the chapter might be all you need for now, and you can leave the more detailed explorations as reference material.
+
+So an inner class has automatic access to the members of the enclosing class. How can this happen? The inner class secretly captures a reference to the particular object of the enclosing class that was responsible for creating it. Then, when you refer to a member of the enclosing class, that reference is used to select that member. Fortunately, the compiler takes care of all these details for you, but now you can see that an object of an inner class can be created only in association with an object of the enclosing class (when, as you shall see, the inner class is non-static). Construction of the inner-class object requires the reference to the object of the enclosing class, and the compiler will complain if it cannot access that reference. Most of the time this occurs without any intervention on the part of the programmer.
+
+
+Inner classes in methods and scopes
+
+
+Inner classes can be created within a method or even an arbitrary scope. There are two reasons for doing this:
+
+1. As shown previously, you’re implementing an interface of some kind so that you can create and return a reference.
+
+2. You solving a complicated problem and you want to create a class to aid in your solution, but you don’t want it publicly available.
+
+Local inner class - the creation of an entire class within the scope of a method(instead of the scope of another class).
+
+
+Anonymous inner classes
+
+
+public class Parcel7 {
+      public Contents contents() {
+return new Contents() { // Insert a class definition private int i = 11;
+public int value() { return i; }
+        }; // Semicolon required in this case
+      }
+public static void main(String[] args) { Parcel7 p = new Parcel7();
+Contents c = p.contents();
+}
+}
+
+The contents( ) method combines the creation of the return value with the definition of the class that represents that return value! In addition, the class is anonymous; it has no name. To make matters a bit worse, it looks like you’re starting out to create a Contents object, But then, before you get to the semicolon, you say, "But wait, I think I’ll slip in a class definition."
+
+What this strange syntax means is "Create an object of an anonymous class that’s inherited from Contents." The reference returned by the new expression is automatically upcast to a Contents reference. The anonymous inner-class syntax is a shorthand for:
+
+public class Parcel7b {
+      class MyContents implements Contents {
+private int i = 11;
+        public int value() { return i; }
+      }
+      public Contents contents() { return new MyContents(); }
+      public static void main(String[] args) {
+Parcel7b p = new Parcel7b();
+Contents c = p.contents(); }
+}
+
+If you’re defining an anonymous inner class and want to use an object that’s defined outside the anonymous inner class, the compiler requires that the argument reference be final, as you see in the argument to destination( ). If you forget, you’ll get a compile-time error message.
+
+
+Nested classes
+
+
+If you don’t need a connection between the inner-class object and the outerclass object, then you can make the inner class static. This is commonly called a nested class. To understand the meaning of static when applied to inner classes you wast remember that the object of an ordinary inner class implicitly keeps a reference to the object of the enclosing class that created it. This is not true, however, when you say an inner class is static. A nested class means:
+
+1. You don't need an outer-class object in order to create an object of a nested class
+2. You can't access a non-static outer-class object from an object of inner nested class 
+
+Nested classes are different from ordinary inner classes in another way, as well. Fields and methods in ordinary inner classes can only be at the outer level of a class, so ordinary inner classes cannot have static data, static fields, or nested classes. However, nested classes can have all of these:
+
+
+Classes inside interfaces
+
+
+Normally, you can’t put any code inside an interface, but a nested class can be part of an interface. Any class you put inside an interface is automatically public and static. Since the class is static, it doesn’t violate the rules for interfaces—the nested class is only placed inside the namespace of the interface. You can even implement the surrounding interface in the inner class, like this:
+
+public interface ClassInInterface {
+	void howdy();
+  	class Test implements ClassInInterface {
+    		public void howdy() {
+		System.out.println("Howdy!"); }
+		public static void main(String[] args) { 
+			new Test().howdy();
+		} 
+	}
+}
+
+
+Why inner classes?
+
+
+At this point you’ve seen a lot of syntax and semantics describing the way inner classes work, but this doesn’t answer the question of why they exist. Why did the Java designers go to so much trouble to add this fundamental language feature?
+
+Typically, the inner class inherits from a class or implements an interface, and the code in the inner class manipulates the outer-class object that it was created within. So you could say that an inner class provides a kind of window into the outer class.
+
+A question that cuts to the heart of inner classes is this: If I just need a reference to an interface, why don’t I just make the outer class implement that interface? The answer is "If that’s all you need, then that’s how you should do it." So what is it that distinguishes an inner class implementing an interface from an outer class implementing the same interface? The answer is that you can’t always have the convenience of interfaces—sometimes you’re working with implementations. So the most compelling reason for inner classes is:
+
+	Each inner class can independently inherit from an implementation. Thus, the inner 	class is not limited by whether the outer class is already inheriting from an 		implementation.
+
+Without the ability that inner classes provide to inherit—in effect—from more than one concrete or abstract class, some design and programming problems would be intractable. So one way to look at the inner class is as the rest of the solution of the multiple-inheritance problem. Interfaces solve part of the problem, but inner classes effectively allow "multiple implementation inheritance." That is, inner classes effectively allow you to inherit from more than one non-interface.
+
+If you didn’t need to solve the "multiple implementation inheritance" problem, you could conceivably code around everything else without the need for inner classes. But with inner classes you have these additional features:
+
+
+1. The inner class can have multiple instances, each with its own state information that is independent of the information in the outer-class object.
+
+2. In a single outer class you can have several inners lasses, each of which implements the same interface or inherits from the same class in a different way.
+
+3. The point of creation of the inner - class object is not tied to the creation of the outer - class object.
+
+4. There is no potentially confusing "is-a" relationship with the inner class; it’s a separate entity.
+
+
+
+Closures & callbacks
+
+
+A closure is a callable object that retains information from the scope in which it was created. From this definition, you can see that an inner class is an object-oriented closure, because it doesn’t just contain each piece of information from the outer-class object ("the scope in which it was created"), but it automatically holds a reference back to the whole outer-class object, where it has permission to manipulate all the members, even private ones.
+
+One of the most compelling arguments made to include some kind of pointer mechanism in Java was to allow callbacks. With a callback, some other object is given a piece of information that allows it to call back into the originating object at some later point. This is a very powerful concept, as you will see later in the book. If a callback is implemented using a pointer, however, you must rely on the programmer to behave properly and not misuse the pointer. As you’ve seen by now, Java tends to be more careful than that, so pointers were not included in the language.
+
+
+Inheriting from inner classes
+
+
+Because the inner-class constructor must attach to a reference of the enclosing class object, things are slightly complicated when you inherit from an inner class. The problem is that the "secret" reference to the enclosing class object must be initialized, and yet in the derived class there’s no longer a default object to attach to. You must use a special syntax to make the association explicit:
+
+class WithInner {
+      class Inner {}
+}
+
+public class InheritInner extends WithInner.Inner { 
+	//! InheritInner() {} // Won’t compile 
+	InheritInner(WithInner wi) {
+		wi.super(); 
+	}
+
+	public static void main(String[] args) { 
+		WithInner wi = new WithInner(); 	
+		InheritInner ii = new InheritInner(wi);
+	}
+}
+
+You can see that InheritInner is extending only the inner class, not the outer one. But when it comes time to create a constructor, the default one is no good, and you can’t just pass a reference to an enclosing object. In addition, you must use the syntax
+
+enclosingClassReference.super();
+
+inside the constructor. This provides the necessary reference, and the program will then compile.
+
+
+As noted earlier, inner classes can also be created inside code blocks, typically inside the body of a method. A local inner class cannot have an access specifier because it isn’t part of the outer class, but it does have access to the final variables in the current code block and all the members of the enclosing class. Here’s an example comparing the creation of a local inner class with an anonymous inner class:
+
+t is implemented as both a local class and an anonymous inner class, both of which have the same behaviors and capabilities. Since the name of the local inner class is not accessible outside the method, the only justification for using a local inner class instead of an anonymous inner class is if you need a named constructor and/or an overloaded constructor, since an anonymous inner class can only use instance initialization.
+
+Summary
+
+Interfaces and inner classes are more sophisticated concepts than what you’ll find in many OOP languages; for example, there’s nothing like them in C++. Together, they solve the same problem that C++ attempts to solve with its multiple inheritance (MI) feature. However, MI in C++ turns out to be rather difficult to use, whereas Java interfaces and inner classes are, by comparison, much more accessible.
+
+Although the features themselves are reasonably straightforward, the use of these features is a design issue, much the same as polymorphism. Over time, you’ll become better at recognizing situations where you should use an interface, or an inner class, or both. But at this point in this book, you should at least be comfortable with the syntax and semantics. As you see these language features in use, you’ll eventually internalize them.

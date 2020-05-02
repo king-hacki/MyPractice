@@ -1,12 +1,13 @@
 import React from 'react';
 import './App.css';
-import Test from './Test'
-// import  Say, SayUtterance  from 'react-say'
-import  {SayButton, SayUtterance}  from 'react-say'
+import Say from './Say'
+
+
 
 function App() {
+
   return (
-    <Test/>
+    <Say/>
   )
 }
   
