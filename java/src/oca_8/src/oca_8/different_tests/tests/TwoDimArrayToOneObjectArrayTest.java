@@ -4,7 +4,7 @@ public class TwoDimArrayToOneObjectArrayTest {
     static int [][] array1;
     public static void main(String[] args) {
 
-        array1[1][1] = 3;        //  NullPointerException
+//        array1[1][1] = 3;        //  NullPointerException
         int [][] array = new int[2][2];
         Object [] objects = array;
         objects[1] = "x";

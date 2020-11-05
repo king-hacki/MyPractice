@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="51c7f060-1eee-456c-8e4e-aa76b6275bb8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/codewars.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/src/enough_is_enough/EnoughIsEnough.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/src/maximum_subarray_sum/MaxSubArray.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/codewars/codewars/src/sum_of_digits/DigitsRoot.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/design_patterns_and_principles/BuilderPattern.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/design_patterns_and_principles/TestSingleton.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/generics_and_collections/FromArrayToList.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/generics_and_collections/GenericLimitationTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/generics_and_collections/GenericMethodsCallTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/generics_and_collections/UnboundedWildcardTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/generics_and_collections/UpperBoundWildcardsTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/java/src/ocp_8/src/tests/InterfacesWithSameDefault.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/main/English-Game" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/logo192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/logo512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/public/test.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/App.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/App.test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/Say.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/serviceWorker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/test-voice/src/setupTests.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/game/test/type-n-speak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/public/favicon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/public/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/public/logo192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/public/logo512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/public/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/public/robots.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/App.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/App.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/App.test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/actions/postAction.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/actions/types.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/components/Postform.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/components/Posts.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/reducers/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/reducers/postReducer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/serviceWorker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/setupTests.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/react/redux_example/src/store.js" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1daLq5zhm94Hhf9UYq9zKlPCNbA" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="51c7f060-1eee-456c-8e4e-aa76b6275bb8" name="Default Changelist" comment="" />
+      <created>1592658444943</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1592658444943</updated>
+      <workItem from="1592658459335" duration="11000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="128" y="0" key="#Project_Structure" timestamp="1592658472626">
+      <screen x="0" y="0" width="1280" height="800" />
+    </state>
+    <state x="128" y="0" key="#Project_Structure/0.0.1280.800@0.0.1280.800" timestamp="1592658472626" />
+  </component>
+</project>

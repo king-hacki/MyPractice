@@ -1,0 +1,25 @@
+package tests;
+
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+public class QueueOfferPush {
+
+    public static void main(String[] args) {
+
+        Queue<Integer> queue = new ArrayDeque<>();
+
+        queue.offer(null);
+        queue.offer(2);
+        queue.offer(3);
+
+        System.out.println(queue);
+
+        System.out.println(queue.peek());
+
+        System.out.println(queue.remove());
+        System.out.println(queue.remove());
+
+    }
+
+}

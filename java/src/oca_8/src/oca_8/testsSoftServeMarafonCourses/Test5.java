@@ -11,18 +11,16 @@ public class Test5 {
     }
 
     static void print(Person o) {
-        System.out.println("Object");
+        System.out.println("Person");
     }
 
     static void print(Employee o) {
-        System.out.println("Object");
+        System.out.println("Employee");
     }
 
     public static void main(String[] args) {
-
-        Object c  = new  SpecialEmployee();
+        Object c = new SpecialEmployee();
         print(c);
-
     }
 
 }

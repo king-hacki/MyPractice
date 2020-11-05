@@ -6,7 +6,7 @@ import java.util.Arrays;
 public class TestStringBuilderCapacity {
     public static void main(String[] args) {
 
-        StringBuilder stringBuilder = new StringBuilder(200);
+        StringBuilder stringBuilder = new StringBuilder(20);
         stringBuilder.append(32);
 
         System.out.println("capacity : " + stringBuilder.capacity());

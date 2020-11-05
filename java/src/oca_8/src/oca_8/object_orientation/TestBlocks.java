@@ -17,6 +17,5 @@ interface T {
 class AA implements T {
     {
         T.super.m();
-
     }
 }

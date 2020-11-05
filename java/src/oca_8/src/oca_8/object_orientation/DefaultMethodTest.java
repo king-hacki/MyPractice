@@ -5,11 +5,11 @@ public class DefaultMethodTest {
         Test2A test2A = new Test2A();
         TestA testA = new TestA();
         A a2 = new Test2A();
-        A a = new Test2A();
+        A a = new TestA();
         test2A.def();           //  default interface A
         testA.def();            //  default class TestA
         a2.def();               //  default interface A
-        a.def();                //  default interface A
+        a.def();                //  default class TestA
     }
 }
 

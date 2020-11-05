@@ -13,7 +13,6 @@ public class ImplementsInterfacesWithTheSameDefaultMethods {
         b.def();
 
         A anonymous = new A(){
-            @Override
             public void def() {
                 System.out.println("Anonymous def");
             }
@@ -34,9 +33,13 @@ interface B {
     }
 }
 
-class Implementer implements A, B {
+interface C extends A, B {          //      must be def() implementation
+    default void def() {
+        System.out.println("interface C");
+    }
+}
 
-    @Override
+class Implementer implements A, B {
     public void def() {
         System.out.println("Implementer");
     }
@@ -45,6 +48,5 @@ class Implementer implements A, B {
 //abstract class AbstractImplementer implements A, B { }        CE need implement method def()
 
 abstract class AbstractImplementer implements A, B {
-    @Override
     public abstract void def();
 }

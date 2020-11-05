@@ -11,7 +11,7 @@ public class OwnFunctionalInterfaceLambda {
         testFunc(() -> System.out.println("HI"));
 
 //        AddFuncInterface addFuncInterface = (int x) -> 5 + 4;     can't be int must be long
-        AddFuncInterface addFuncInterface = x -> (int) (x + 4);
+        AddFuncInterface addFuncInterface = x -> (int) x + 4;
         System.out.println(addFuncInterface.add(100000));
     }
 }

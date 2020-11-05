@@ -2,6 +2,7 @@ package oca_8.different_tests.tests;
 
 public class PurposeOfAbstractConstructor {
     public static void main(String[] args) {
+
 //        Abstract err = new Abstract();       CE
 
         //  anonymous
@@ -11,6 +12,8 @@ public class PurposeOfAbstractConstructor {
                 System.out.println("Anonymous abstract class");
             }
         };
+
+//        CheckForNewInAnonymous justCheck = new CheckForNewInAnonymous("smth") {}; CAN'T GIVE PARAM
 
         Abstract poli = new AbstractDerived("Derived class created");
         AbstractDerived abstractDerived = new AbstractDerived("Polymorphism class created");
@@ -25,6 +28,8 @@ public class PurposeOfAbstractConstructor {
 
     }
 }
+
+interface CheckForNewInAnonymous {}
 
 abstract class Abstract {
 
@@ -52,3 +57,4 @@ class AbstractDerived extends Abstract {
         System.out.println("AbstractDerived");
     }
 }
+
